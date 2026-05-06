@@ -1,0 +1,127 @@
+@model IEnumerable<LibraryManagement.Models.ApplicationUser>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Quản lý Độc giả";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 text-primary fw-bold mb-0">Quản lý Độc giả</h1>
+        <a asp-action="Create" class="btn btn-primary btn-primary-custom">
+            <i class="bi bi-person-plus"></i> Thêm độc giả mới
+        </a>
+    </div>
+
+    <!-- Search bar -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-3">
+            <form asp-action="Index" method="get" class="row g-2">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" name="searchTerm" class="form-control border-start-0" placeholder="Tìm theo tên, email hoặc số thẻ..." value="@Context.Request.Query["searchTerm"]">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-secondary w-100">Tìm kiếm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Độc giả</th>
+                            <th>Thông tin liên hệ</th>
+                            <th>Thẻ thư viện</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var isLocked = await UserManager.IsLockedOutAsync(item);
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: bold;">
+                                            @item.FullName.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">@item.FullName</div>
+                                            <div class="text-muted small">ID: @item.Id.Substring(0, 8)...</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="small"><i class="bi bi-envelope me-1"></i> @item.Email</div>
+                                    <div class="small text-muted"><i class="bi bi-telephone me-1"></i> @(item.PhoneNumber ?? "N/A")</div>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.LibraryCardNumber))
+                                    {
+                                        <span class="badge bg-info text-dark">
+                                            <i class="bi bi-card-heading me-1"></i> @item.LibraryCardNumber
+                                        </span>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Hết hạn: @(item.CardExpiryDate?.ToShortDateString() ?? "N/A")</div>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="IssueCard" asp-route-id="@item.Id" method="post">
+                                            <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none">Cấp thẻ ngay</button>
+                                        </form>
+                                    }
+                                </td>
+                                <td>
+                                    @if (isLocked)
+                                    {
+                                        <span class="badge bg-danger">Đã khóa</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Đang hoạt động</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            Quản lý
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                            <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id"><i class="bi bi-info-circle me-2"></i> Chi tiết</a></li>
+                                            <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pencil me-2"></i> Sửa thông tin</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form asp-action="ToggleLock" asp-route-id="@item.Id" method="post">
+                                                    <button type="submit" class="dropdown-item @(isLocked ? "text-success" : "text-warning")">
+                                                        <i class="bi @(isLocked ? "bi-unlock" : "bi-lock") me-2"></i>
+                                                        @(isLocked ? "Mở khóa tài khoản" : "Khóa tài khoản")
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Xóa độc giả này sẽ xóa toàn bộ dữ liệu liên quan. Bạn chắc chứ?')">
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i> Xóa độc giả
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

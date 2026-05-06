@@ -1,0 +1,49 @@
+@model IEnumerable<LibraryManagement.Models.Notification>
+@{
+    ViewData["Title"] = "Thông báo của tôi";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 text-primary fw-bold mb-0">Thông báo</h1>
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <form asp-action="MarkAllAsRead" method="post">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">Đánh dấu tất cả là đã đọc</button>
+            </form>
+        }
+    </div>
+
+    <div class="list-group shadow-sm rounded-3 overflow-hidden">
+        @foreach (var item in Model)
+        {
+            <div class="list-group-item list-group-item-action p-4 @(item.IsRead ? "bg-white" : "bg-light")">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0 fw-bold @(item.IsRead ? "text-muted" : "text-dark")">@item.Title</h5>
+                    <small class="text-muted">@item.CreatedAt.ToShortDateString() @item.CreatedAt.ToShortTimeString()</small>
+                </div>
+                <p class="mb-3 @(item.IsRead ? "text-muted" : "text-dark")">@item.Message</p>
+                <div class="d-flex gap-2">
+                    @if (!item.IsRead)
+                    {
+                        <form asp-action="MarkAsRead" asp-route-id="@item.Id" method="post">
+                            <button type="submit" class="btn btn-primary btn-sm px-4">Xem chi tiết</button>
+                        </form>
+                    }
+                    else if (!string.IsNullOrEmpty(item.Link))
+                    {
+                        <a href="@item.Link" class="btn btn-outline-primary btn-sm px-4">Xem lại</a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-bell-slash text-muted opacity-25" style="font-size: 5rem;"></i>
+            <p class="mt-3 text-muted">Bạn hiện không có thông báo nào.</p>
+        </div>
+    }
+</div>

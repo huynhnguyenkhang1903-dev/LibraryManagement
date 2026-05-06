@@ -1,0 +1,129 @@
+@model LibraryManagement.Models.Book
+@{
+    ViewData["Title"] = "Thêm sách mới";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white border-bottom-0 py-4">
+                    <h2 class="text-center text-primary fw-bold mb-0">Thêm sách mới</h2>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Create" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+                        
+                        <div class="row g-4">
+                            <!-- Left Column: Image Upload -->
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="mb-3">
+                                        <img id="imagePreview" src="#" alt="Preview" class="img-fluid rounded-3 d-none shadow-sm" style="max-height: 400px; border: 2px dashed #dee2e6;">
+                                        <div id="noImage" class="bg-light rounded-3 d-flex flex-column align-items-center justify-content-center" style="height: 400px; border: 2px dashed #dee2e6;">
+                                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted small mt-2">Chưa chọn ảnh bìa</p>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="imageFile" class="btn btn-outline-secondary w-100">
+                                            <i class="bi bi-upload"></i> Chọn ảnh bìa
+                                        </label>
+                                        <input type="file" id="imageFile" name="imageFile" class="d-none" accept="image/*" onchange="previewImage(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Book Info -->
+                            <div class="col-md-8">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <input asp-for="Title" class="form-control" placeholder="Tiêu đề" />
+                                            <label asp-for="Title"></label>
+                                            <span asp-validation-for="Title" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="Author" class="form-control" placeholder="Tác giả" />
+                                            <label asp-for="Author"></label>
+                                            <span asp-validation-for="Author" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                                                <option value="">Chọn thể loại...</option>
+                                            </select>
+                                            <label asp-for="CategoryId"></label>
+                                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="Price" class="form-control" placeholder="Giá" />
+                                            <label asp-for="Price"></label>
+                                            <span asp-validation-for="Price" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="StockQuantity" class="form-control" placeholder="Số lượng tồn" />
+                                            <label asp-for="StockQuantity"></label>
+                                            <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <input asp-for="ISBN" class="form-control" placeholder="ISBN" />
+                                            <label asp-for="ISBN"></label>
+                                            <span asp-validation-for="ISBN" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <textarea asp-for="Description" class="form-control" placeholder="Mô tả" style="height: 150px"></textarea>
+                                            <label asp-for="Description"></label>
+                                            <span asp-validation-for="Description" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-5">
+                            <a asp-action="Index" class="btn btn-light px-4">Hủy</a>
+                            <button type="submit" class="btn btn-primary px-5 btn-primary-custom">Lưu sách</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(input) {
+            var preview = document.getElementById('imagePreview');
+            var noImage = document.getElementById('noImage');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    noImage.classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

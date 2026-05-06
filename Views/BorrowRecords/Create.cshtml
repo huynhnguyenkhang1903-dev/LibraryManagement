@@ -1,0 +1,57 @@
+@model LibraryManagement.Models.BorrowRecord
+@{
+    ViewData["Title"] = "Tạo phiếu mượn";
+}
+
+<div class="account-page">
+    <div class="account-card" style="max-width: 600px;">
+        <h2 class="text-center mb-4">Tạo phiếu mượn sách</h2>
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger small mb-3"></div>
+            
+            <div class="mb-4 text-center">
+                <i class="bi bi-journal-check text-primary" style="font-size: 3rem;"></i>
+            </div>
+
+            <div class="form-floating mb-3">
+                <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId" required>
+                    <option value="">-- Chọn độc giả --</option>
+                </select>
+                <label asp-for="UserId">Độc giả</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <select asp-for="BookId" class="form-select" asp-items="ViewBag.BookId" required>
+                    <option value="">-- Chọn sách --</option>
+                </select>
+                <label asp-for="BookId">Sách</label>
+                <p class="small text-muted mt-1 px-2"><i class="bi bi-info-circle me-1"></i> Chỉ hiển thị sách còn trong kho.</p>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="DueDate" type="date" class="form-control" value="@Model.DueDate.ToString("yyyy-MM-dd")" required />
+                <label asp-for="DueDate"></label>
+                <span asp-validation-for="DueDate" class="text-danger small"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <textarea asp-for="Note" class="form-control" placeholder="Ghi chú (nếu có)" style="height: 100px"></textarea>
+                <label asp-for="Note"></label>
+            </div>
+            
+            <div class="alert alert-info small">
+                <i class="bi bi-lightbulb me-2"></i> 
+                <strong>Lưu ý:</strong> Một độc giả chỉ được mượn tối đa <strong>5 cuốn sách</strong> cùng lúc.
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 btn-primary-custom mb-3 mt-3">Xác nhận cho mượn</button>
+            <div class="text-center">
+                <a asp-action="Index" class="text-decoration-none small">Quay lại danh sách</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

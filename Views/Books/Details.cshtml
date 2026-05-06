@@ -1,0 +1,85 @@
+@model LibraryManagement.Models.Book
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Thư viện</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="row g-0">
+            <div class="col-lg-4 bg-light">
+                <div class="p-4 h-100 d-flex align-items-center justify-content-center">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" class="img-fluid rounded-3 shadow" alt="@Model.Title" style="max-height: 500px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 100%; height: 450px;">
+                            <i class="bi bi-book text-muted opacity-25" style="font-size: 8rem;"></i>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card-body p-5">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-primary rounded-pill mb-2 px-3">@Model.Category?.Name</span>
+                            <h1 class="display-5 fw-bold text-dark mb-1">@Model.Title</h1>
+                            <p class="h4 text-muted mb-0">Tác giả: <span class="text-primary">@Model.Author</span></p>
+                        </div>
+                        <div class="text-end">
+                            <h2 class="text-primary fw-bold mb-0">@Model.Price.ToString("C0")</h2>
+                            <span class="badge @(Model.StockQuantity > 0 ? "bg-success" : "bg-danger") p-2 px-3 rounded-pill mt-2">
+                                @(Model.StockQuantity > 0 ? $"Còn {Model.StockQuantity} cuốn" : "Hết sách")
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase small fw-bold mb-2">Thông tin xuất bản</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-upc-scan me-2 text-primary"></i> <strong>ISBN:</strong> @(Model.ISBN ?? "N/A")</li>
+                                <li class="mb-2"><i class="bi bi-calendar-event me-2 text-primary"></i> <strong>Ngày nhập:</strong> @Model.CreatedAt.ToShortDateString()</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3">Mô tả tóm tắt</h6>
+                    <p class="text-dark lh-lg mb-5" style="white-space: pre-line;">
+                        @(string.IsNullOrEmpty(Model.Description) ? "Hiện chưa có mô tả cho cuốn sách này." : Model.Description)
+                    </p>
+
+                    <div class="d-flex gap-3">
+                        @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary btn-lg px-5 rounded-pill shadow-sm">
+                                <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa
+                            </a>
+                            <a asp-controller="BorrowRecords" asp-action="Create" asp-route-bookId="@Model.Id" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                                <i class="bi bi-journal-plus me-2"></i> Cho mượn ngay
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm @(Model.StockQuantity <= 0 ? "disabled" : "")">
+                                <i class="bi bi-bookmark-plus me-2"></i> Đăng ký mượn
+                            </button>
+                        }
+                        <a asp-action="Index" class="btn btn-outline-dark btn-lg px-4 rounded-pill">Quay lại</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

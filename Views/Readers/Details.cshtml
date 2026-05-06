@@ -1,0 +1,114 @@
+@model LibraryManagement.Models.ApplicationUser
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Chi tiết Độc giả";
+    var isLocked = await UserManager.IsLockedOutAsync(Model);
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-4 shadow-sm" style="width: 80px; height: 80px; font-size: 2.5rem; font-weight: bold;">
+                            @Model.FullName.Substring(0, 1).ToUpper()
+                        </div>
+                        <div>
+                            <h2 class="mb-1">@Model.FullName</h2>
+                            <p class="mb-0 opacity-75">
+                                <i class="bi bi-person-badge me-2"></i> Độc giả thư viện
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-5">
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase small fw-bold mb-3">Thông tin liên hệ</h6>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-3">
+                                    <i class="bi bi-envelope text-primary me-2"></i>
+                                    <strong>Email:</strong> @Model.Email
+                                </li>
+                                <li class="mb-3">
+                                    <i class="bi bi-telephone text-primary me-2"></i>
+                                    <strong>Số điện thoại:</strong> @(Model.PhoneNumber ?? "Chưa cập nhật")
+                                </li>
+                                <li class="mb-3">
+                                    <i class="bi bi-geo-alt text-primary me-2"></i>
+                                    <strong>Địa chỉ:</strong> @(Model.Address ?? "Chưa cập nhật")
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase small fw-bold mb-3">Thẻ Thư Viện</h6>
+                            <div class="p-3 bg-light rounded-3 border">
+                                @if (!string.IsNullOrEmpty(Model.LibraryCardNumber))
+                                {
+                                    <div class="mb-2">
+                                        <span class="text-muted small">Số thẻ:</span>
+                                        <div class="h5 text-primary fw-bold">@Model.LibraryCardNumber</div>
+                                    </div>
+                                    <div class="row g-2 mt-2">
+                                        <div class="col-6">
+                                            <span class="text-muted d-block small">Ngày cấp:</span>
+                                            <span class="small">@(Model.CardIssueDate?.ToShortDateString() ?? "N/A")</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="text-muted d-block small">Ngày hết hạn:</span>
+                                            <span class="small">@(Model.CardExpiryDate?.ToShortDateString() ?? "N/A")</span>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-center py-2">
+                                        <p class="text-muted small mb-3">Chưa có thẻ thư viện</p>
+                                        <form asp-action="IssueCard" asp-route-id="@Model.Id" method="post">
+                                            <button type="submit" class="btn btn-primary btn-sm px-4">Cấp thẻ ngay</button>
+                                        </form>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-top pt-4">
+                        <h6 class="text-muted text-uppercase small fw-bold mb-3">Trạng thái tài khoản</h6>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                @if (isLocked)
+                                {
+                                    <span class="badge bg-danger p-2 px-3">
+                                        <i class="bi bi-lock-fill me-1"></i> TÀI KHOẢN ĐANG BỊ KHÓA
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success p-2 px-3">
+                                        <i class="bi bi-check-circle-fill me-1"></i> TÀI KHOẢN ĐANG HOẠT ĐỘNG
+                                    </span>
+                                }
+                                <div class="text-muted small mt-2">Ngày tham gia: @Model.CreatedAt.ToLongDateString()</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <form asp-action="ToggleLock" asp-route-id="@Model.Id" method="post">
+                                    <button type="submit" class="btn @(isLocked ? "btn-outline-success" : "btn-outline-warning")">
+                                        <i class="bi @(isLocked ? "bi-unlock" : "bi-lock")"></i>
+                                        @(isLocked ? "Mở khóa" : "Khóa tài khoản")
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light p-4 d-flex justify-content-end gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary px-4">Sửa thông tin</a>
+                    <a asp-action="Index" class="btn btn-outline-dark px-4">Quay lại danh sách</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

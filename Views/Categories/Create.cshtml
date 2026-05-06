@@ -1,0 +1,27 @@
+@model LibraryManagement.Models.Category
+@{
+    ViewData["Title"] = "Thêm thể loại";
+}
+
+<div class="account-page">
+    <div class="account-card">
+        <h2 class="text-center mb-4">Thêm thể loại mới</h2>
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Name" class="form-control" placeholder="Tên thể loại" />
+                <label asp-for="Name"></label>
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <textarea asp-for="Description" class="form-control" placeholder="Mô tả" style="height: 100px"></textarea>
+                <label asp-for="Description"></label>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 btn-primary-custom mb-3">Lưu thể loại</button>
+            <div class="text-center">
+                <a asp-action="Index" class="text-decoration-none small">Quay lại danh sách</a>
+            </div>
+        </form>
+    </div>
+</div>
