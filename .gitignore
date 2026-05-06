@@ -1,0 +1,13 @@
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+out/
+.gemini/
+*.log
+wwwroot/images/books/*
+!wwwroot/images/books/.gitkeep
