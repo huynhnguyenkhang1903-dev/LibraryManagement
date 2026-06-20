@@ -1,0 +1,144 @@
+@model LibraryManagement1.Models.BorrowTicket
+
+@{
+    ViewData["Title"] = "Chi tiết phiếu mượn";
+    var isOverdue = Model.Status == "Overdue";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    <h2 class="mt-2">Chi Tiết Phiếu Mượn: @Model.TicketCode</h2>
+</div>
+
+<div class="row">
+    <!-- Info Panel -->
+    <div class="col-lg-4">
+        <div class="glass-panel mb-4">
+            <h5 class="mb-3 border-bottom border-secondary pb-2">
+                <i class="bi bi-info-circle text-primary me-2"></i>Thông tin chung
+            </h5>
+            
+            <div class="mb-3">
+                <span class="text-secondary d-block fs-8">Mã phiếu mượn</span>
+                <span class="text-dark fw-bold">@Model.TicketCode</span>
+            </div>
+
+            <div class="mb-3">
+                <span class="text-secondary d-block fs-8">Trạng thái phiếu</span>
+                <span class="status-badge @(Model.Status == "Returned" ? "returned" : Model.Status == "Overdue" ? "overdue" : "borrowing")">
+                    @if (Model.Status == "Returned") {
+                        <i class="bi bi-check-circle-fill me-1"></i><span>Đã trả đủ</span>
+                    } else if (Model.Status == "Overdue") {
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i><span>Quá hạn</span>
+                    } else {
+                        <i class="bi bi-hourglass-split me-1"></i><span>Đang mượn</span>
+                    }
+                </span>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <span class="text-secondary d-block fs-8">Ngày mượn</span>
+                    <span class="text-dark">@Model.BorrowDate.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="col-6">
+                    <span class="text-secondary d-block fs-8">Hạn trả</span>
+                    <span class="text-dark fw-500 @(isOverdue ? "text-danger" : "")">@Model.DueDate.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+
+            <div class="mb-1">
+                <span class="text-secondary d-block fs-8">Người lập phiếu</span>
+                <span class="text-secondary">@Model.CreatedByUser?.FullName</span>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <h5 class="mb-3 border-bottom border-secondary pb-2">
+                <i class="bi bi-person text-primary me-2"></i>Thông tin độc giả
+            </h5>
+            <div class="mb-3">
+                <span class="text-secondary d-block fs-8">Họ và tên</span>
+                <span class="text-dark fw-bold">@Model.Reader?.Name</span>
+            </div>
+            <div class="mb-3">
+                <span class="text-secondary d-block fs-8">Mã độc giả</span>
+                <span class="text-primary fw-bold">@Model.Reader?.ReaderCode</span>
+            </div>
+            <div class="mb-3">
+                <span class="text-secondary d-block fs-8">Số điện thoại</span>
+                <span class="text-dark">@Model.Reader?.Phone</span>
+            </div>
+            <div>
+                <span class="text-secondary d-block fs-8">Email</span>
+                <span class="text-dark">@Model.Reader?.Email</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Books Panel -->
+    <div class="col-lg-8">
+        <div class="glass-panel">
+            <h5 class="mb-3 border-bottom border-secondary pb-2">
+                <i class="bi bi-book text-primary me-2"></i>Danh sách sách mượn trong phiếu
+            </h5>
+
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Tên sách</th>
+                            <th style="width: 25%;">Ngày trả thực tế</th>
+                            <th style="width: 15%;">Phạt trễ hạn</th>
+                            <th style="width: 20%;" class="text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.BorrowDetails)
+                        {
+                            <tr>
+                                <td>
+                                    <div>
+                                        <span class="text-dark fw-bold">@detail.Book?.Title</span>
+                                        <div class="text-secondary fs-8">Mã: @detail.Book?.BookCode</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (detail.ReturnDate.HasValue)
+                                    {
+                                        <span class="text-success"><i class="bi bi-check-circle me-1"></i>@detail.ReturnDate.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-warning"><i class="bi bi-clock me-1"></i>Chưa trả</span>
+                                    }
+                                </td>
+                                <td class="fw-bold @(detail.FineAmount > 0 ? "text-danger" : "text-secondary")">
+                                    @(detail.FineAmount > 0 ? $"{detail.FineAmount.ToString("N0")} đ" : "0 đ")
+                                </td>
+                                <td class="text-end">
+                                    @if (!detail.ReturnDate.HasValue)
+                                    {
+                                        <form asp-action="ReturnBook" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="detailId" value="@detail.Id" />
+                                            <button type="submit" class="btn btn-sm btn-premium-primary">
+                                                <i class="bi bi-arrow-return-left"></i> Trả sách
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge returned"><i class="bi bi-check"></i> Hoàn tất</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

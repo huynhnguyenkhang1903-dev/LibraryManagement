@@ -1,0 +1,117 @@
+@model IEnumerable<LibraryManagement1.Models.Book>
+
+@{
+    ViewData["Title"] = "Quản lý Sách";
+    var categories = ViewData["Categories"] as SelectList;
+    var authors = ViewData["Authors"] as SelectList;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Kho Sách Thư Viện</h2>
+        <p class="text-secondary mb-0">Quản lý và tra cứu thông tin sách trong hệ thống</p>
+    </div>
+    <a asp-action="Create" class="btn btn-premium-primary">
+        <i class="bi bi-plus-lg me-2"></i>Thêm sách mới
+    </a>
+</div>
+
+<!-- Search Panel (Chức năng 11: Tra cứu / Tìm kiếm sách) -->
+<div class="glass-panel mb-4">
+    <h5 class="mb-3"><i class="bi bi-search me-2 text-primary"></i>Bộ lọc tìm kiếm & Tra cứu</h5>
+    <form asp-action="Index" method="get">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Từ khóa</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: var(--border-glass) !important;">
+                        <i class="bi bi-search text-secondary"></i>
+                    </span>
+                    <input type="text" name="searchString" class="form-control border-start-0 ps-0" placeholder="Mã sách, tên sách, tác giả..." value="@ViewData["CurrentSearch"]" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Thể loại</label>
+                <select name="categoryId" class="form-select" asp-items="categories">
+                    <option value="">-- Tất cả thể loại --</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Tác giả</label>
+                <select name="authorId" class="form-select" asp-items="authors">
+                    <option value="">-- Tất cả tác giả --</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <div class="d-flex gap-2 w-100">
+                    <button type="submit" class="btn btn-premium-primary flex-grow-1">Tìm kiếm</button>
+                    <a asp-action="Index" class="btn btn-premium-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Books List -->
+<div class="glass-panel">
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Mã sách</th>
+                    <th style="width: 35%;">Tên sách / Thông tin</th>
+                    <th style="width: 15%;">Thể loại</th>
+                    <th style="width: 10%;" class="text-center">Số lượng</th>
+                    <th style="width: 12%;">Giá sách</th>
+                    <th style="width: 18%;" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-secondary py-5">
+                            <i class="bi bi-journal-x fs-1 d-block mb-2"></i>
+                            Không tìm thấy cuốn sách nào khớp với điều kiện lọc.
+                        </td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    // Generate color indicator based on available quantity
+                    var statusClass = item.AvailableQuantity > 0 ? "success" : "danger";
+                    var statusText = item.AvailableQuantity > 0 ? $"Sẵn có ({item.AvailableQuantity})" : "Hết sách";
+                    
+                    <tr>
+                        <td class="text-primary fw-bold">@item.BookCode</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="~/images/default_book_cover.png" class="book-thumbnail" alt="Bìa sách" />
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@item.Title</h6>
+                                    <small class="text-secondary">Tác giả: @item.Author?.Name | NXB: @item.Publisher?.Name</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-secondary">@item.Category?.Name</td>
+                        <td class="text-center">
+                            <div class="fw-bold text-dark">@item.AvailableQuantity / @item.Quantity</div>
+                            <span class="status-badge @(item.AvailableQuantity > 0 ? "returned" : "overdue") px-2 py-0.5" style="font-size: 0.65rem;">
+                                @statusText
+                            </span>
+                        </td>
+                        <td class="fw-500 text-dark">@item.Price.ToString("N0") đ</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-premium-secondary me-2">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-premium-danger">
+                                <i class="bi bi-trash"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

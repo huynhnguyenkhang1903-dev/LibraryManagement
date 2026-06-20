@@ -1,0 +1,57 @@
+@model LibraryManagement1.Models.Author
+
+@{
+    ViewData["Title"] = "Xóa tác giả";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    <h2 class="text-white mt-2">Xác Nhận Xóa Tác Giả</h2>
+</div>
+
+<div class="glass-panel" style="max-width: 600px;">
+    <div class="text-center mb-4">
+        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem; filter: drop-shadow(0 0 10px var(--danger-glow));"></i>
+        <h4 class="text-white mt-2">Bạn có chắc chắn muốn xóa tác giả này?</h4>
+        <p class="text-secondary">Hành động này không thể hoàn tác sau khi thực hiện.</p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-custom mb-3">
+            <ul class="mb-0 ps-3">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="bg-black bg-opacity-20 p-3 rounded-3 mb-4 border border-secondary" style="border-color: var(--border-glass) !important;">
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Tên tác giả:</div>
+            <div class="col-8 text-white fw-bold">@Model.Name</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Ngày sinh:</div>
+            <div class="col-8 text-white">@(Model.BirthDate.HasValue ? Model.BirthDate.Value.ToString("dd/MM/yyyy") : "N/A")</div>
+        </div>
+        <div class="row">
+            <div class="col-4 text-secondary fw-500">Tiểu sử:</div>
+            <div class="col-8 text-secondary">@Model.Bio</div>
+        </div>
+    </div>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-premium-danger">
+                <i class="bi bi-trash me-2"></i>Xác nhận xóa
+            </button>
+            <a asp-action="Index" class="btn btn-premium-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>

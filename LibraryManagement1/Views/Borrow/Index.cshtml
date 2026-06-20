@@ -1,0 +1,118 @@
+@model IEnumerable<LibraryManagement1.Models.BorrowTicket>
+
+@{
+    ViewData["Title"] = "Mượn - Trả sách";
+    var status = ViewData["CurrentStatus"] as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Giao dịch Mượn - Trả</h2>
+        <p class="text-secondary mb-0">Quản lý phiếu mượn sách, xử lý trả sách và ghi nhận quá hạn</p>
+    </div>
+    <a asp-action="Create" class="btn btn-premium-primary">
+        <i class="bi bi-file-earmark-plus me-2"></i>Lập phiếu mượn mới
+    </a>
+</div>
+
+<!-- Filters Panel -->
+<div class="glass-panel mb-4">
+    <form asp-action="Index" method="get" class="row g-3 align-items-center">
+        <div class="col-md-5">
+            <label class="form-label">Tìm kiếm phiếu mượn</label>
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: var(--border-glass) !important;">
+                    <i class="bi bi-search text-secondary"></i>
+                </span>
+                <input type="text" name="searchString" class="form-control border-start-0 ps-0" placeholder="Mã phiếu mượn, tên độc giả, mã độc giả..." value="@ViewData["CurrentSearch"]" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Trạng thái</label>
+            <select name="statusFilter" class="form-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Borrowing" selected="@(status == "Borrowing" ? "selected" : null)">Đang mượn</option>
+                <option value="Returned" selected="@(status == "Returned" ? "selected" : null)">Đã trả đủ</option>
+                <option value="Overdue" selected="@(status == "Overdue" ? "selected" : null)">Quá hạn</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end" style="height: 70px;">
+            <div class="d-flex gap-2 w-100">
+                <button type="submit" class="btn btn-premium-primary flex-grow-1">Lọc kết quả</button>
+                <a asp-action="Index" class="btn btn-premium-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- List of Tickets -->
+<div class="glass-panel">
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Mã Phiếu</th>
+                    <th style="width: 25%;">Độc Giả</th>
+                    <th style="width: 15%;">Ngày Mượn</th>
+                    <th style="width: 15%;">Hạn Hẹn Trả</th>
+                    <th style="width: 15%;">Trạng Thái</th>
+                    <th style="width: 15%;" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-secondary py-5">
+                            <i class="bi bi-file-earmark-x fs-1 d-block mb-2"></i>
+                            Không tìm thấy phiếu mượn nào.
+                        </td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    var statusClass = "";
+                    var statusText = "";
+                    if (item.Status == "Borrowing")
+                    {
+                        statusClass = "borrowing";
+                        statusText = "Đang mượn";
+                    }
+                    else if (item.Status == "Returned")
+                    {
+                        statusClass = "returned";
+                        statusText = "Đã trả đủ";
+                    }
+                    else if (item.Status == "Overdue")
+                    {
+                        statusClass = "overdue";
+                        statusText = "Quá hạn";
+                    }
+
+                    <tr>
+                        <td class="text-primary fw-bold">@item.TicketCode</td>
+                        <td>
+                            <div>
+                                <span class="text-dark fw-bold">@item.Reader?.Name</span>
+                                <div class="text-secondary fs-8">Mã ĐG: @item.Reader?.ReaderCode</div>
+                            </div>
+                        </td>
+                        <td class="text-secondary">@item.BorrowDate.ToString("dd/MM/yyyy")</td>
+                        <td class="text-secondary">@item.DueDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="status-badge @statusClass">
+                                <i class="bi @(item.Status == "Returned" ? "bi-check-circle-fill" : item.Status == "Overdue" ? "bi-exclamation-triangle-fill" : "bi-hourglass-split")"></i>
+                                @statusText
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-premium-primary">
+                                <i class="bi bi-eye"></i> Chi tiết / Trả
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

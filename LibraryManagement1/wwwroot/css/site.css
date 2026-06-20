@@ -1,0 +1,415 @@
+/* SaaS Slate CSS Theme for LibAdmin Pro */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-primary: #f8fafc; /* Slate 50 - clean modern grey-blue */
+    --bg-secondary: #ffffff; /* Pure white card background */
+    --bg-glass: rgba(15, 23, 42, 0.015);
+    --border-glass: #e2e8f0; /* Slate 200 - thin slate borders */
+    --text-primary: #0f172a; /* Slate 900 - dark text for high legibility */
+    --text-secondary: #475569; /* Slate 600 - secondary description text */
+    --primary: #2563eb; /* Blue 600 - vivid modern blue accent */
+    --primary-glow: rgba(37, 99, 235, 0.1);
+    --success: #16a34a; /* Green 600 */
+    --success-glow: rgba(22, 163, 74, 0.08);
+    --warning: #ea580c; /* Orange 600 */
+    --warning-glow: rgba(234, 88, 12, 0.08);
+    --danger: #dc2626; /* Red 600 */
+    --danger-glow: rgba(220, 38, 38, 0.08);
+    --card-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(15, 23, 42, 0.04);
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(203, 213, 225, 0.15) 0px, transparent 40%),
+        radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.2) 0px, transparent 40%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Modern Card Panels */
+.glass-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
+}
+.glass-panel:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+}
+
+/* Dashboard Cards with left accent line */
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+}
+.stat-card.primary::before { background: var(--primary); }
+.stat-card.success::before { background: var(--success); }
+.stat-card.warning::before { background: var(--warning); }
+.stat-card.danger::before { background: var(--danger); }
+
+/* Layout Structure */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar with Dark Slate styling (professional SaaS look) */
+.sidebar {
+    width: 280px;
+    background: #0f172a; /* Slate 900 */
+    border-right: 1px solid #1e293b;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+    transition: var(--transition);
+}
+
+.main-content-wrapper {
+    margin-left: 280px;
+    flex-grow: 1;
+    padding: 2rem;
+    min-height: 100vh;
+    transition: var(--transition);
+}
+
+/* Sidebar branding */
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 1.5rem 1rem;
+    border-bottom: 1px solid #1e293b;
+    margin-bottom: 1.5rem;
+}
+.brand-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Navigation Links */
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.nav-menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: #94a3b8; /* Muted slate gray */
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.nav-menu-item a:hover,
+.nav-menu-item.active a {
+    color: #ffffff;
+    background: #1e293b; /* Slate 800 */
+}
+.nav-menu-item.active a {
+    border-left: 3px solid #3b82f6; /* Vivid blue indicator */
+    border-radius: 0 8px 8px 0;
+    background: #1e293b;
+}
+
+.user-profile-section {
+    margin-top: auto;
+    padding: 1rem;
+    background: #1e293b; /* Slate 800 */
+    border-radius: 10px;
+    border: 1px solid #334155;
+}
+
+/* Custom Table Style */
+.custom-table {
+    width: 100%;
+    color: var(--text-primary);
+    border-collapse: separate;
+    border-spacing: 0 0.4rem;
+}
+.custom-table th {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 0.75rem 1rem;
+}
+.custom-table tr {
+    background: #ffffff;
+    transition: var(--transition);
+}
+.custom-table tr:hover {
+    background: #f1f5f9; /* Slate 100 hover */
+    transform: translateY(-1px);
+}
+.custom-table td {
+    padding: 1rem;
+    border-top: 1px solid var(--border-glass);
+    border-bottom: 1px solid var(--border-glass);
+}
+.custom-table td:first-child {
+    border-left: 1px solid var(--border-glass);
+    border-radius: 8px 0 0 8px;
+}
+.custom-table td:last-child {
+    border-right: 1px solid var(--border-glass);
+    border-radius: 0 8px 8px 0;
+}
+
+/* Badges with modern background and high contrast text */
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.status-badge.borrowing {
+    background: #eff6ff; /* Soft blue */
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+.status-badge.returned {
+    background: var(--success-glow);
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+.status-badge.overdue {
+    background: var(--danger-glow);
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Form Controls & Inputs */
+.form-control, .form-select {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    transition: var(--transition);
+}
+.form-control:focus, .form-select:focus {
+    background: #ffffff;
+    border-color: var(--primary);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+}
+.form-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+}
+
+/* Premium Buttons */
+.btn-premium-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem 1.25rem;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+    transition: var(--transition);
+}
+.btn-premium-primary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+    color: #ffffff;
+}
+.btn-premium-secondary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.65rem 1.25rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.btn-premium-secondary:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: translateY(-1.5px);
+}
+.btn-premium-danger {
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 8px;
+    padding: 0.65rem 1.25rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.btn-premium-danger:hover {
+    background: #dc2626;
+    color: #ffffff;
+    transform: translateY(-1.5px);
+}
+
+/* Login layout with Slate Overlay */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('/images/library_banner.png');
+    background-size: cover;
+    background-position: center;
+}
+.login-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 3rem 2.5rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    color: var(--text-primary);
+}
+.login-card h2, .login-card label, .login-card p {
+    color: var(--text-primary) !important;
+}
+
+/* Headings colors */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Quick Search container styling */
+.search-container {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.2rem 0.5rem;
+}
+
+/* Header Banner inside Dashboard */
+.cozy-banner {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.5) 100%), url('/images/library_banner.png');
+    background-size: cover;
+    background-position: center;
+    padding: 3rem 2.5rem;
+    color: #ffffff;
+    box-shadow: var(--card-shadow);
+}
+.cozy-banner h2 {
+    color: #ffffff !important;
+}
+
+/* Alert Styling */
+.alert-custom {
+    background: rgba(220, 38, 38, 0.05);
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    color: #dc2626;
+    border-radius: 8px;
+}
+
+/* Book Cover Thumbnail elements */
+.book-thumbnail {
+    width: 42px;
+    height: 56px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+.book-thumbnail-large {
+    width: 100px;
+    height: 140px;
+    border-radius: 6px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+}
+
+/* Mobile responsive menu */
+@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+    }
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    .main-content-wrapper {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    .toggle-sidebar-btn {
+        display: block !important;
+    }
+}
+
+.toggle-sidebar-btn {
+    display: none;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+/* Ensure no text-white classes make text invisible on the light background */
+.main-content-wrapper .text-white:not(.btn):not(.btn *):not(.badge):not(.badge *):not(.avatar):not(.avatar *):not(.cozy-banner):not(.cozy-banner *):not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger) {
+    color: var(--text-primary) !important;
+}
+
+/* Darken secondary text slightly for higher legibility/contrast */
+.main-content-wrapper .text-secondary {
+    color: #475569 !important;
+}

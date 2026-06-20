@@ -1,0 +1,20 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Từ chối truy cập";
+}
+
+<div class="d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="glass-panel text-center p-5" style="max-width: 500px;">
+        <i class="bi bi-shield-lock-fill text-danger mb-4" style="font-size: 5rem; filter: drop-shadow(0 0 15px var(--danger-glow));"></i>
+        <h2 class="text-white mb-3">Từ Chối Truy Cập</h2>
+        <p class="text-secondary mb-4">Bạn không có quyền hạn cần thiết để truy cập vào chức năng hoặc trang này. Vui lòng liên hệ với Quản trị viên hệ thống để biết thêm chi tiết.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-premium-primary">
+                <i class="bi bi-house-door-fill me-2"></i>Quay lại Trang chủ
+            </a>
+            <a asp-controller="Auth" asp-action="Logout" class="btn btn-premium-secondary">
+                Đăng xuất tài khoản
+            </a>
+        </div>
+    </div>
+</div>

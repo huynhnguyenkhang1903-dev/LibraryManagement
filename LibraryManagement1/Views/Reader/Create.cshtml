@@ -1,0 +1,77 @@
+@model LibraryManagement1.Models.Reader
+
+@{
+    ViewData["Title"] = "Thêm độc giả";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    <h2 class="text-white mt-2">Thêm Độc Giả Mới</h2>
+</div>
+
+<div class="glass-panel">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="alert alert-custom mb-3"></div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="ReaderCode" class="form-label">Mã độc giả</label>
+                <input asp-for="ReaderCode" class="form-control" placeholder="Ví dụ: DG001" required />
+                <span asp-validation-for="ReaderCode" class="text-danger fs-7"></span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Name" class="form-label">Họ tên độc giả</label>
+                <input asp-for="Name" class="form-control" placeholder="Nhập đầy đủ họ tên" required />
+                <span asp-validation-for="Name" class="text-danger fs-7"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="BirthDate" class="form-label">Ngày sinh</label>
+                <input asp-for="BirthDate" class="form-control" type="date" required />
+                <span asp-validation-for="BirthDate" class="text-danger fs-7"></span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="ExpiryDate" class="form-label">Ngày hết hạn thẻ</label>
+                <input asp-for="ExpiryDate" class="form-control" type="date" value="@DateTime.Now.AddYears(1).ToString("yyyy-MM-dd")" required />
+                <span asp-validation-for="ExpiryDate" class="text-danger fs-7"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Phone" class="form-label">Số điện thoại</label>
+                <input asp-for="Phone" class="form-control" placeholder="Nhập số điện thoại liên hệ" required />
+                <span asp-validation-for="Phone" class="text-danger fs-7"></span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" type="email" placeholder="Ví dụ: docgia@gmail.com" />
+                <span asp-validation-for="Email" class="text-danger fs-7"></span>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Address" class="form-label">Địa chỉ</label>
+            <textarea asp-for="Address" class="form-control" rows="2" placeholder="Nhập địa chỉ độc giả"></textarea>
+            <span asp-validation-for="Address" class="text-danger fs-7"></span>
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-premium-primary">
+                <i class="bi bi-check-lg me-2"></i>Lưu độc giả
+            </button>
+            <a asp-action="Index" class="btn btn-premium-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

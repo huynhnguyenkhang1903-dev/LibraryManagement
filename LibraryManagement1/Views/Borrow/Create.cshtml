@@ -1,0 +1,119 @@
+@model LibraryManagement1.Models.BorrowTicket
+
+@{
+    ViewData["Title"] = "Lập phiếu mượn";
+    var books = ViewData["Books"] as IEnumerable<LibraryManagement1.Models.Book> ?? new List<LibraryManagement1.Models.Book>();
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    <h2 class="mt-2">Lập Phiếu Mượn Sách Mới</h2>
+</div>
+
+<div class="glass-panel">
+    <form asp-action="Create" method="post" id="borrow-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-custom mb-4"></div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="readerId" class="form-label">Chọn Độc Giả</label>
+                <select name="readerId" id="readerId" class="form-select" asp-items="ViewBag.ReaderId" required>
+                    <option value="">-- Chọn độc giả mượn sách --</option>
+                </select>
+                <small class="text-secondary">Chỉ hiển thị các độc giả có thẻ thư viện còn hiệu lực.</small>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="dueDate" class="form-label">Hạn trả hẹn trước</label>
+                <input type="date" name="dueDate" id="dueDate" class="form-control" value="@DateTime.Now.AddDays(14).ToString("yyyy-MM-dd")" required />
+                <small class="text-secondary">Mặc định thời hạn mượn sách là 14 ngày.</small>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label d-block">Chọn Sách Mượn (Tối đa 5 cuốn)</label>
+            
+            <!-- Quick book search in checklist -->
+            <div class="input-group mb-3" style="max-width: 400px;">
+                <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: var(--border-glass) !important;">
+                    <i class="bi bi-funnel text-secondary"></i>
+                </span>
+                <input type="text" id="book-search" class="form-control border-start-0 ps-0" placeholder="Lọc nhanh sách..." />
+            </div>
+
+            <div class="glass-panel p-3 bg-black bg-opacity-20 border border-secondary" style="max-height: 350px; overflow-y: auto; border-color: var(--border-glass) !important;">
+                <div class="row g-2" id="books-list-container">
+                    @if (!books.Any())
+                    {
+                        <div class="col-12 text-center text-secondary py-4">Không có sách khả dụng trong kho.</div>
+                    }
+                    @foreach (var book in books)
+                    {
+                        <div class="col-md-6 book-item-row" data-title="@book.Title.ToLower()" data-code="@book.BookCode.ToLower()">
+                            <div class="d-flex align-items-center gap-3 p-2 rounded hover-bg-glass" style="border: 1px solid rgba(255,255,255,0.03); transition: all 0.2s;">
+                                <input type="checkbox" name="selectedBookIds" value="@book.Id" id="book-@book.Id" class="form-check-input book-checkbox" style="width: 20px; height: 20px; margin-top: 0; flex-shrink: 0;" />
+                                <img src="~/images/default_book_cover.png" class="book-thumbnail" style="width: 32px; height: 44px;" alt="Cover" />
+                                <label for="book-@book.Id" class="form-check-label flex-grow-1 cursor-pointer">
+                                    <div class="fw-bold text-dark small">@book.Title</div>
+                                    <div class="text-secondary fs-8">Mã: @book.BookCode | Tồn khả dụng: <span class="text-success fw-bold">@book.AvailableQuantity</span></div>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+                <small class="text-secondary" id="selected-count">Đã chọn: 0 / 5 cuốn</small>
+                <small class="text-danger d-none" id="max-warning">Đã đạt giới hạn tối đa mượn sách!</small>
+            </div>
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-premium-primary" id="submit-btn">
+                <i class="bi bi-file-earmark-check me-2"></i>Lập phiếu mượn
+            </button>
+            <a asp-action="Index" class="btn btn-premium-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Live Search Books
+            $("#book-search").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#books-list-container .book-item-row").filter(function() {
+                    $(this).toggle($(this).attr("data-title").indexOf(value) > -1 || $(this).attr("data-code").indexOf(value) > -1);
+                });
+            });
+
+            // Limit selection to 5 books
+            $(".book-checkbox").on("change", function() {
+                var checkedCount = $(".book-checkbox:checked").length;
+                $("#selected-count").text("Đã chọn: " + checkedCount + " / 5 cuốn");
+
+                if (checkedCount >= 5) {
+                    $(".book-checkbox:not(:checked)").attr("disabled", true);
+                    $("#max-warning").removeClass("d-none");
+                } else {
+                    $(".book-checkbox").removeAttr("disabled");
+                    $("#max-warning").addClass("d-none");
+                }
+            });
+
+            // Validate form on submit
+            $("#borrow-form").on("submit", function(e) {
+                var checkedCount = $(".book-checkbox:checked").length;
+                if (checkedCount === 0) {
+                    alert("Vui lòng chọn ít nhất 1 cuốn sách để mượn!");
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

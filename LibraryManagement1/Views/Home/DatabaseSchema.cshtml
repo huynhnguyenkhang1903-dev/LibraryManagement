@@ -1,0 +1,644 @@
+@{
+    ViewData["Title"] = "Thiết kế Database - LibAdmin Pro";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header Page -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <span class="badge bg-primary px-3 py-2 mb-2">DATABASE SCHEMA</span>
+            <h2 class="mb-1 text-slate-900 fw-bold">Sơ đồ và Cấu trúc Database</h2>
+            <p class="text-secondary mb-0">Tra cứu trực quan cấu trúc bảng, kiểu dữ liệu và mối quan hệ thực thể (ERD) trong hệ thống SQLite.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button id="btn-toggle-diagram" class="btn btn-premium-primary d-flex align-items-center gap-2">
+                <i class="bi bi-diagram-3-fill"></i>
+                <span>Ẩn/Hiện Sơ đồ ERD</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ERD Diagram Panel -->
+    <div class="glass-panel p-4 mb-4" id="erd-panel">
+        <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-bezier2 text-primary"></i>
+            <span>Sơ đồ Quan hệ Thực thể (ERD)</span>
+        </h4>
+        <div class="d-flex justify-content-center bg-white p-3 rounded-3 border border-slate-100 overflow-auto">
+            <div class="mermaid text-center w-100" style="min-height: 400px;">
+                erDiagram
+                    Users {
+                        int Id PK
+                        string Username
+                        string PasswordHash
+                        string FullName
+                        string Role
+                    }
+                    Categories {
+                        int Id PK
+                        string Name
+                        string Description
+                    }
+                    Authors {
+                        int Id PK
+                        string Name
+                        string Bio
+                        datetime BirthDate
+                    }
+                    Publishers {
+                        int Id PK
+                        string Name
+                        string Address
+                        string Phone
+                    }
+                    Books {
+                        int Id PK
+                        string BookCode
+                        string Title
+                        int CategoryId FK
+                        int AuthorId FK
+                        int PublisherId FK
+                        int PublishYear
+                        int Quantity
+                        int AvailableQuantity
+                        decimal Price
+                    }
+                    Readers {
+                        int Id PK
+                        string ReaderCode
+                        string Name
+                        datetime BirthDate
+                        string Address
+                        string Phone
+                        string Email
+                        datetime CreatedDate
+                        datetime ExpiryDate
+                    }
+                    BorrowTickets {
+                        int Id PK
+                        string TicketCode
+                        int ReaderId FK
+                        datetime BorrowDate
+                        datetime DueDate
+                        string Status
+                    }
+                    BorrowDetails {
+                        int Id PK
+                        int BorrowTicketId FK
+                        int BookId FK
+                        datetime ReturnDate
+                        decimal FineAmount
+                    }
+                    FineReceipts {
+                        int Id PK
+                        string ReceiptCode
+                        int ReaderId FK
+                        int BorrowTicketId FK
+                        decimal FineAmount
+                        decimal AmountPaid
+                        datetime PaymentDate
+                    }
+
+                    Categories ||--o{ Books : "has"
+                    Authors ||--o{ Books : "writes"
+                    Publishers ||--o{ Books : "publishes"
+                    Readers ||--o{ BorrowTickets : "borrows"
+                    BorrowTickets ||--|{ BorrowDetails : "contains"
+                    Books ||--o{ BorrowDetails : "borrowed_in"
+                    Readers ||--o{ FineReceipts : "pays"
+                    BorrowTickets ||--o{ FineReceipts : "associated_with"
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Table Grid -->
+    <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+        <i class="bi bi-grid-3x3-gap-fill text-primary"></i>
+        <span>Chi tiết Cấu trúc 9 Bảng</span>
+    </h4>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        <!-- 1. Users -->
+        <div class="col table-card-container" data-table="users" data-relations="none">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-people-fill text-primary me-2"></i>Users</span>
+                    <span class="badge bg-secondary fs-8">User.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Username</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">PasswordHash</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">FullName</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Role</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Categories -->
+        <div class="col table-card-container" data-table="categories" data-relations="books">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-tags-fill text-primary me-2"></i>Categories</span>
+                    <span class="badge bg-secondary fs-8">Category.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Name</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Description</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Null)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Authors -->
+        <div class="col table-card-container" data-table="authors" data-relations="books">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-person-fill text-primary me-2"></i>Authors</span>
+                    <span class="badge bg-secondary fs-8">Author.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Name</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Bio</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Null)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">BirthDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Null)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Publishers -->
+        <div class="col table-card-container" data-table="publishers" data-relations="books">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-building-fill text-primary me-2"></i>Publishers</span>
+                    <span class="badge bg-secondary fs-8">Publisher.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Name</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Address</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Null)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Phone</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Null)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Books -->
+        <div class="col table-card-container" data-table="books" data-relations="categories authors publishers borrowdetails">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-book-fill text-primary me-2"></i>Books</span>
+                    <span class="badge bg-secondary fs-8">Book.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">BookCode</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Title</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>CategoryId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> Categories)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>AuthorId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> Authors)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>PublisherId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> Publishers)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">PublishYear</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Quantity</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">AvailableQuantity</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Price</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">decimal (Req)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Readers -->
+        <div class="col table-card-container" data-table="readers" data-relations="borrowtickets finereceipts">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-card-text text-primary me-2"></i>Readers</span>
+                    <span class="badge bg-secondary fs-8">Reader.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">ReaderCode</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Name</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">BirthDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Address</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Null)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Phone</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Null)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Email</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Null)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">CreatedDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">ExpiryDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Req)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. BorrowTickets -->
+        <div class="col table-card-container" data-table="borrowtickets" data-relations="readers borrowdetails finereceipts">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i>BorrowTickets</span>
+                    <span class="badge bg-secondary fs-8">BorrowTicket.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">TicketCode</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>ReaderId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> Readers)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">BorrowDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">DueDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">Status</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. BorrowDetails -->
+        <div class="col table-card-container" data-table="borrowdetails" data-relations="borrowtickets books">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-list-task text-primary me-2"></i>BorrowDetails</span>
+                    <span class="badge bg-secondary fs-8">BorrowDetail.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>BorrowTicketId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> BorrowTickets)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>BookId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> Books)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">ReturnDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Null)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">FineAmount</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">decimal (Req)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. FineReceipts -->
+        <div class="col table-card-container" data-table="finereceipts" data-relations="readers borrowtickets">
+            <div class="glass-panel h-100 p-3 schema-card">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <span class="fw-bold text-slate-800 fs-5"><i class="bi bi-receipt-cutoff text-primary me-2"></i>FineReceipts</span>
+                    <span class="badge bg-secondary fs-8">FineReceipt.cs</span>
+                </div>
+                <div class="schema-field-list">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <i class="bi bi-key-fill text-warning me-2" title="Khóa chính"></i><strong>Id</strong>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">int (PK)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">ReceiptCode</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">string (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>ReaderId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> Readers)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1 text-primary">
+                        <div>
+                            <i class="bi bi-link-45deg me-2" title="Khóa ngoại"></i><strong>BorrowTicketId</strong>
+                        </div>
+                        <span class="badge bg-primary text-white fs-8">int (FK -> BorrowTickets)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">FineAmount</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">decimal (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">AmountPaid</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">decimal (Req)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <div>
+                            <span class="ps-4">PaymentDate</span>
+                        </div>
+                        <span class="badge bg-light text-dark fs-8 border">DateTime (Req)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Schema card custom style */
+    .schema-card {
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border-glass);
+    }
+    .schema-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--primary) !important;
+        box-shadow: 0 12px 20px rgba(37, 99, 235, 0.08) !important;
+    }
+    .schema-card.highlighted {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2), 0 12px 20px rgba(37, 99, 235, 0.08) !important;
+        background: #f8fafc;
+    }
+    .schema-card.dimmed {
+        opacity: 0.45;
+        filter: grayscale(20%);
+    }
+    /* Mermaid styling adjustments to match SaaS Slate */
+    .mermaid svg {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    .text-slate-900 {
+        color: #0f172a !important;
+    }
+    .text-slate-800 {
+        color: #1e293b !important;
+    }
+</style>
+
+@section Scripts {
+    <!-- Load Mermaid JS from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        // Initialize Mermaid with custom style values to fit SaaS Slate theme
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eff6ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#bfdbfe',
+                lineColor: '#64748b',
+                secondaryColor: '#f8fafc',
+                tertiaryColor: '#ffffff',
+                mainBkg: '#ffffff',
+                actorBkg: '#ffffff',
+                actorBorder: '#cbd5e1',
+                signalColor: '#2563eb',
+                signalTextColor: '#0f172a'
+            }
+        });
+
+        $(document).ready(function () {
+            // Toggle ERD diagram panel visibility
+            $("#btn-toggle-diagram").click(function () {
+                $("#erd-panel").slideToggle(250);
+            });
+
+            // Interactive highlights on table card hover/click
+            $(".schema-card").click(function () {
+                var container = $(this).closest(".table-card-container");
+                var tableName = container.data("table");
+                var relationsStr = container.data("relations");
+                
+                if ($(this).hasClass("highlighted")) {
+                    // Reset all
+                    $(".schema-card").removeClass("highlighted dimmed");
+                } else {
+                    // Highlight selected and related cards, dim others
+                    $(".schema-card").removeClass("highlighted").addClass("dimmed");
+                    $(this).removeClass("dimmed").addClass("highlighted");
+                    
+                    if (relationsStr && relationsStr !== "none") {
+                        var relatedTables = relationsStr.split(" ");
+                        relatedTables.forEach(function (rel) {
+                            $(".table-card-container[data-table='" + rel + "'] .schema-card")
+                                .removeClass("dimmed")
+                                .addClass("highlighted");
+                        });
+                    }
+                }
+            });
+
+            // Double click anywhere outside to reset highlighting
+            $(document).on("click", function (e) {
+                if (!$(e.target).closest(".schema-card").length && !$(e.target).closest("#btn-toggle-diagram").length) {
+                    $(".schema-card").removeClass("highlighted dimmed");
+                }
+            });
+        });
+    </script>
+}

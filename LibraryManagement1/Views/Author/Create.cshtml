@@ -1,0 +1,47 @@
+@model LibraryManagement1.Models.Author
+
+@{
+    ViewData["Title"] = "Thêm tác giả";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    <h2 class="text-white mt-2">Thêm Tác Giả Mới</h2>
+</div>
+
+<div class="glass-panel" style="max-width: 600px;">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="alert alert-custom mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập tên tác giả" required />
+            <span asp-validation-for="Name" class="text-danger fs-7"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="BirthDate" class="form-label"></label>
+            <input asp-for="BirthDate" class="form-control" />
+            <span asp-validation-for="BirthDate" class="text-danger fs-7"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Bio" class="form-label"></label>
+            <textarea asp-for="Bio" class="form-control" rows="4" placeholder="Tóm tắt tiểu sử hoặc thông tin tác giả"></textarea>
+            <span asp-validation-for="Bio" class="text-danger fs-7"></span>
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-premium-primary">
+                <i class="bi bi-check-lg me-2"></i>Lưu tác giả
+            </button>
+            <a asp-action="Index" class="btn btn-premium-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

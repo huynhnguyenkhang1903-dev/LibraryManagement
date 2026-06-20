@@ -1,0 +1,73 @@
+@model LibraryManagement1.Models.Book
+
+@{
+    ViewData["Title"] = "Xóa sách";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    <h2 class="text-white mt-2">Xác Nhận Xóa Sách</h2>
+</div>
+
+<div class="glass-panel" style="max-width: 700px;">
+    <div class="text-center mb-4">
+        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem; filter: drop-shadow(0 0 10px var(--danger-glow));"></i>
+        <h4 class="text-white mt-2">Bạn có chắc chắn muốn xóa cuốn sách này khỏi kho?</h4>
+        <p class="text-secondary">Hành động này không thể hoàn tác và không thể thực hiện nếu sách đang có người mượn.</p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-custom mb-3">
+            <ul class="mb-0 ps-3">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="bg-black bg-opacity-20 p-3 rounded-3 mb-4 border border-secondary" style="border-color: var(--border-glass) !important;">
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Mã sách:</div>
+            <div class="col-8 text-primary fw-bold">@Model.BookCode</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Tên sách:</div>
+            <div class="col-8 text-white fw-bold">@Model.Title</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Thể loại:</div>
+            <div class="col-8 text-white">@Model.Category?.Name</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Tác giả:</div>
+            <div class="col-8 text-white">@Model.Author?.Name</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Nhà xuất bản:</div>
+            <div class="col-8 text-white">@Model.Publisher?.Name</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4 text-secondary fw-500">Số lượng hiện tại:</div>
+            <div class="col-8 text-white">@Model.AvailableQuantity / @Model.Quantity cuốn</div>
+        </div>
+        <div class="row">
+            <div class="col-4 text-secondary fw-500">Giá trị sách:</div>
+            <div class="col-8 text-white">@Model.Price.ToString("N0") VNĐ</div>
+        </div>
+    </div>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-premium-danger">
+                <i class="bi bi-trash me-2"></i>Xác nhận xóa
+            </button>
+            <a asp-action="Index" class="btn btn-premium-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>

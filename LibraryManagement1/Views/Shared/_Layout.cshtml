@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LibAdmin Pro</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom site CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        var currentRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Staff";
+        var currentFullName = User.FindFirst("FullName")?.Value ?? User.Identity.Name ?? "Thủ thư";
+
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="brand-section">
+                    <i class="bi bi-book-half fs-3" style="color: var(--primary) !important;"></i>
+                    <span class="brand-title">LIBADMIN PRO</span>
+                </div>
+
+                <nav class="flex-grow-1">
+                    <ul class="nav-menu">
+                        <li class="nav-menu-item" id="nav-dashboard">
+                            <a asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-books">
+                            <a asp-controller="Book" asp-action="Index">
+                                <i class="bi bi-journal-bookmark-fill"></i>
+                                <span>Quản lý Sách</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-categories">
+                            <a asp-controller="Category" asp-action="Index">
+                                <i class="bi bi-tags"></i>
+                                <span>Thể loại sách</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-authors">
+                            <a asp-controller="Author" asp-action="Index">
+                                <i class="bi bi-people"></i>
+                                <span>Tác giả</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-publishers">
+                            <a asp-controller="Publisher" asp-action="Index">
+                                <i class="bi bi-building"></i>
+                                <span>Nhà xuất bản</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-readers">
+                            <a asp-controller="Reader" asp-action="Index">
+                                <i class="bi bi-card-list"></i>
+                                <span>Độc giả</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-borrow">
+                            <a asp-controller="Borrow" asp-action="Index">
+                                <i class="bi bi-clipboard-check"></i>
+                                <span>Mượn - Trả sách</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-fine">
+                            <a asp-controller="Fine" asp-action="Index">
+                                <i class="bi bi-cash-coin"></i>
+                                <span>Quản lý Tiền phạt</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-database">
+                            <a asp-controller="Home" asp-action="DatabaseSchema">
+                                <i class="bi bi-database-fill-gear"></i>
+                                <span>Thiết kế Database</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="user-profile-section d-flex flex-column gap-2 mt-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="avatar text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; font-weight: bold; background-color: var(--primary) !important;">
+                            @currentFullName.Substring(0, Math.Min(2, currentFullName.Length)).ToUpper()
+                        </div>
+                        <div class="user-info overflow-hidden">
+                            <h6 class="mb-0 text-truncate fs-7 text-white">@currentFullName</h6>
+                            <span class="text-secondary fs-8">@(currentRole == "Admin" ? "Quản trị viên" : "Thủ thư")</span>
+                        </div>
+                    </div>
+                    <hr class="my-2 border-secondary" style="opacity: 0.2;" />
+                    <a asp-controller="Auth" asp-action="Logout" class="btn btn-sm btn-premium-danger w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Đăng xuất</span>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <div class="main-content-wrapper">
+                <!-- Mobile top bar -->
+                <header class="d-lg-none d-flex align-items-center justify-content-between mb-4 glass-panel p-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-book-half fs-4" style="color: var(--primary) !important;"></i>
+                        <span class="fw-bold fs-5" style="color: var(--text-primary) !important;">LibAdmin Pro</span>
+                    </div>
+                    <button class="toggle-sidebar-btn d-flex align-items-center justify-content-center" id="toggle-sidebar">
+                        <i class="bi bi-list fs-4"></i>
+                    </button>
+                </header>
+
+                <main role="main">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    }
+    else
+    {
+        <main role="main">
+            @RenderBody()
+        </main>
+    }
+
+    <!-- Core Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <!-- Sidebar Toggle JS -->
+    <script>
+        $(document).ready(function () {
+            $("#toggle-sidebar").click(function () {
+                $("#sidebar").toggleClass("show");
+            });
+
+            // Highlight current menu item based on controller/action
+            var currentController = '@ViewContext.RouteData.Values["controller"]';
+            var currentAction = '@ViewContext.RouteData.Values["action"]';
+            if (currentController === 'Home') {
+                if (currentAction === 'DatabaseSchema') {
+                    $('#nav-database').addClass('active');
+                } else {
+                    $('#nav-dashboard').addClass('active');
+                }
+            } else if (currentController === 'Book') {
+                $('#nav-books').addClass('active');
+            } else if (currentController === 'Category') {
+                $('#nav-categories').addClass('active');
+            } else if (currentController === 'Author') {
+                $('#nav-authors').addClass('active');
+            } else if (currentController === 'Publisher') {
+                $('#nav-publishers').addClass('active');
+            } else if (currentController === 'Reader') {
+                $('#nav-readers').addClass('active');
+            } else if (currentController === 'Borrow') {
+                $('#nav-borrow').addClass('active');
+            } else if (currentController === 'Fine') {
+                $('#nav-fine').addClass('active');
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

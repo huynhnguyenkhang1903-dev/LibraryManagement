@@ -1,0 +1,54 @@
+@model IEnumerable<LibraryManagement1.Models.Author>
+
+@{
+    ViewData["Title"] = "Tác giả";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="text-white mb-1">Tác giả</h2>
+        <p class="text-secondary mb-0">Quản lý danh sách tác giả viết sách</p>
+    </div>
+    <a asp-action="Create" class="btn btn-premium-primary">
+        <i class="bi bi-plus-lg me-2"></i>Thêm tác giả mới
+    </a>
+</div>
+
+<div class="glass-panel">
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Tên tác giả</th>
+                    <th style="width: 20%;">Ngày sinh</th>
+                    <th style="width: 35%;">Tiểu sử</th>
+                    <th style="width: 20%;" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-secondary py-4">Chưa có tác giả nào được thêm.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-white">@item.Name</td>
+                        <td class="text-secondary">@(item.BirthDate.HasValue ? item.BirthDate.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                        <td class="text-secondary text-truncate" style="max-width: 250px;">@item.Bio</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-premium-secondary me-2">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-premium-danger">
+                                <i class="bi bi-trash"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

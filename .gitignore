@@ -1,0 +1,17 @@
+## Ignore Visual Studio temporary files, builds, and databases
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS-generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# SQLite databases (temporary files)
+*.db-shm
+*.db-wal

@@ -1,0 +1,116 @@
+@model IEnumerable<LibraryManagement1.Models.BorrowDetail>
+
+@{
+    ViewData["Title"] = "Quản lý tiền phạt";
+    var receipts = ViewData["Receipts"] as IEnumerable<LibraryManagement1.Models.FineReceipt> ?? new List<LibraryManagement1.Models.FineReceipt>();
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4 bg-success bg-opacity-20 border-success text-success" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info alert-dismissible fade show mb-4 bg-info bg-opacity-20 border-info text-info" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>@TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="mb-4">
+    <h2 class="mb-1">Quản lý Tiền Phạt Trễ Hạn</h2>
+    <p class="text-secondary mb-0">Theo dõi các khoản phạt do trả sách quá hạn và quản lý biên lai thu phạt</p>
+</div>
+
+<div class="row">
+    <!-- Fined Transactions (Sách trả trễ cần thu phạt) -->
+    <div class="col-lg-6 mb-4">
+        <div class="glass-panel h-100">
+            <h4 class="mb-3"><i class="bi bi-exclamation-octagon text-danger me-2"></i>Khoản Phạt Trả Trễ</h4>
+            
+            <div class="table-responsive">
+                <table class="custom-table" style="font-size: 0.9rem;">
+                    <thead>
+                        <tr>
+                            <th>Độc giả</th>
+                            <th>Sách</th>
+                            <th>Số tiền phạt</th>
+                            <th class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-secondary py-4">Không có giao dịch phạt trễ hạn nào.</td>
+                            </tr>
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">@item.BorrowTicket?.Reader?.Name</div>
+                                    <small class="text-secondary">Mã: @item.BorrowTicket?.TicketCode</small>
+                                </td>
+                                <td>
+                                    <div class="text-secondary text-truncate" style="max-width: 150px;">@item.Book?.Title</div>
+                                    <small class="text-secondary">Hạn: @item.BorrowTicket?.DueDate.ToString("dd/MM") | Trả: @item.ReturnDate?.ToString("dd/MM")</small>
+                                </td>
+                                <td class="text-danger fw-bold">@item.FineAmount.ToString("N0") đ</td>
+                                <td class="text-end">
+                                    <a asp-action="Pay" asp-route-detailId="@item.Id" class="btn btn-sm btn-premium-primary">
+                                        Thu phạt
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipts (Lịch sử thu tiền) -->
+    <div class="col-lg-6 mb-4">
+        <div class="glass-panel h-100">
+            <h4 class="mb-3"><i class="bi bi-receipt-cutoff text-success me-2"></i>Biên Lai Thu Phạt</h4>
+            
+            <div class="table-responsive">
+                <table class="custom-table" style="font-size: 0.9rem;">
+                    <thead>
+                        <tr>
+                            <th>Biên lai</th>
+                            <th>Độc giả</th>
+                            <th>Số tiền thu</th>
+                            <th>Ngày thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!receipts.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-secondary py-4">Chưa có biên lai thu phạt nào được lập.</td>
+                            </tr>
+                        }
+                        @foreach (var rec in receipts)
+                        {
+                            <tr>
+                                <td class="text-primary fw-bold">@rec.ReceiptCode</td>
+                                <td>
+                                    <div class="text-dark fw-bold">@rec.Reader?.Name</div>
+                                    <small class="text-secondary">Phiếu: @rec.BorrowTicket?.TicketCode</small>
+                                </td>
+                                <td class="text-success fw-bold">@rec.AmountPaid.ToString("N0") đ</td>
+                                <td class="text-secondary">@rec.PaymentDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
