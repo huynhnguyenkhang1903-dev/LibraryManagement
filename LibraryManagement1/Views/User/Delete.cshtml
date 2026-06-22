@@ -1,0 +1,64 @@
+@model LibraryManagement1.Models.User
+
+@{
+    ViewData["Title"] = "Xóa Nhân viên";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    <h2 class="mt-2">Xác Nhận Xóa Nhân Viên</h2>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-xl-6">
+        <div class="glass-panel border-danger" style="border-left: 4px solid var(--danger) !important;">
+            <h5 class="text-danger fw-bold mb-3"><i class="bi bi-exclamation-triangle-fill me-2"></i>Cảnh báo hành động</h5>
+            <p class="text-dark mb-4">Bạn có chắc chắn muốn xóa tài khoản nhân viên **@Model.Username** khỏi hệ thống hay không? Hành động này không thể hoàn tác.</p>
+
+            <table class="table table-borderless mb-4">
+                <tr>
+                    <td class="text-secondary px-0 py-1" style="width: 30%;">Tên đăng nhập:</td>
+                    <td class="text-dark fw-bold px-0 py-1">@Model.Username</td>
+                </tr>
+                <tr>
+                    <td class="text-secondary px-0 py-1">Họ và tên:</td>
+                    <td class="text-dark fw-bold px-0 py-1">@Model.FullName</td>
+                </tr>
+                <tr>
+                    <td class="text-secondary px-0 py-1">Quyền hạn:</td>
+                    <td class="text-dark fw-bold px-0 py-1">
+                        <span class="badge @(Model.Role == "Admin" ? "bg-danger-subtle text-danger" : "bg-info-subtle text-info") px-3 py-1">
+                            @Model.Role
+                        </span>
+                    </td>
+                </tr>
+            </table>
+
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-custom mb-3 text-start">
+                        <ul class="mb-0 ps-3">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-premium-danger flex-grow-1">
+                        <i class="bi bi-trash-fill me-1"></i>Xác nhận xóa tài khoản
+                    </button>
+                    <a asp-action="Index" class="btn btn-premium-secondary px-4">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

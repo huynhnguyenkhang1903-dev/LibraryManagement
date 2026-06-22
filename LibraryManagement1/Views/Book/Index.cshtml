@@ -102,6 +102,9 @@
                         </td>
                         <td class="fw-500 text-dark">@item.Price.ToString("N0") đ</td>
                         <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-premium-secondary me-2">
+                                <i class="bi bi-info-circle"></i> Chi tiết
+                            </a>
                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-premium-secondary me-2">
                                 <i class="bi bi-pencil-square"></i> Sửa
                             </a>

@@ -2,6 +2,7 @@ using LibraryManagement1.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace LibraryManagement1.Controllers
 {
@@ -9,10 +10,28 @@ namespace LibraryManagement1.Controllers
     public class ReaderController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public ReaderController(LibraryDbContext context)
+        public ReaderController(LibraryDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
+        }
+
+        private LibrarySettings GetSettings()
+        {
+            var settingsPath = Path.Combine(_env.WebRootPath, "settings.json");
+            if (System.IO.File.Exists(settingsPath))
+            {
+                try
+                {
+                    var json = System.IO.File.ReadAllText(settingsPath);
+                    var settings = JsonSerializer.Deserialize<LibrarySettings>(json);
+                    if (settings != null) return settings;
+                }
+                catch { }
+            }
+            return new LibrarySettings();
         }
 
         // GET: Reader
@@ -37,6 +56,8 @@ namespace LibraryManagement1.Controllers
         // GET: Reader/Create
         public IActionResult Create()
         {
+            var settings = GetSettings();
+            ViewBag.CardExpiryMonths = settings.CardExpiryMonths;
             return View();
         }
 

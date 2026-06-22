@@ -1,0 +1,76 @@
+@model IEnumerable<LibraryManagement1.Models.User>
+
+@{
+    ViewData["Title"] = "Quản lý Nhân viên";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Danh Sách Nhân Viên</h2>
+        <p class="text-secondary mb-0">Quản lý và cấp quyền cho nhân viên/thủ thư trong hệ thống</p>
+    </div>
+    <a asp-action="Create" class="btn btn-premium-primary">
+        <i class="bi bi-person-plus me-2"></i>Thêm nhân viên mới
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="background-color: var(--success-glow); color: var(--success); border-left: 4px solid var(--success) !important;">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="glass-panel">
+    <div class="table-responsive">
+        <table class="custom-table mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Tên đăng nhập</th>
+                    <th style="width: 35%;">Họ và tên</th>
+                    <th style="width: 20%;">Vai trò / Quyền hạn</th>
+                    <th style="width: 20%;" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var isCurrent = item.Username.Equals(User.Identity?.Name, StringComparison.OrdinalIgnoreCase);
+                    <tr>
+                        <td class="fw-bold text-primary">
+                            @item.Username
+                            @if (isCurrent)
+                            {
+                                <span class="badge bg-primary ms-1" style="font-size: 0.65rem;">Bạn</span>
+                            }
+                        </td>
+                        <td class="text-dark">@item.FullName</td>
+                        <td>
+                            <span class="badge @(item.Role == "Admin" ? "bg-danger-subtle text-danger" : "bg-info-subtle text-info") px-3 py-1.5" style="font-size: 0.75rem; border: 1px solid var(--border-glass);">
+                                @(item.Role == "Admin" ? "Quản trị viên (Admin)" : "Thủ thư (Staff)")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-premium-secondary me-2">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            @if (!isCurrent)
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-premium-danger">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-premium-danger border-0 text-muted" disabled style="background: rgba(0,0,0,0.02);">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

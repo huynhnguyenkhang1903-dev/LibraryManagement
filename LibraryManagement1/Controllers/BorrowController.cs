@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace LibraryManagement1.Controllers
 {
@@ -10,11 +11,28 @@ namespace LibraryManagement1.Controllers
     public class BorrowController : Controller
     {
         private readonly LibraryDbContext _context;
-        private const decimal FINE_PER_DAY = 5000; // 5,000 VNĐ / day late
+        private readonly IWebHostEnvironment _env;
 
-        public BorrowController(LibraryDbContext context)
+        public BorrowController(LibraryDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
+        }
+
+        private LibrarySettings GetSettings()
+        {
+            var settingsPath = Path.Combine(_env.WebRootPath, "settings.json");
+            if (System.IO.File.Exists(settingsPath))
+            {
+                try
+                {
+                    var json = System.IO.File.ReadAllText(settingsPath);
+                    var settings = JsonSerializer.Deserialize<LibrarySettings>(json);
+                    if (settings != null) return settings;
+                }
+                catch { }
+            }
+            return new LibrarySettings(); // default fallback
         }
 
         // GET: Borrow
@@ -79,6 +97,10 @@ namespace LibraryManagement1.Controllers
         // GET: Borrow/Create
         public async Task<IActionResult> Create()
         {
+            var settings = GetSettings();
+            ViewBag.MaxBooks = settings.MaxBooks;
+            ViewBag.MaxBorrowDays = settings.MaxBorrowDays;
+
             // Populate drop-down list of readers whose cards are not expired
             var activeReaders = await _context.Readers
                 .Where(r => r.ExpiryDate >= DateTime.Now)
@@ -120,15 +142,16 @@ namespace LibraryManagement1.Controllers
                 return await RebuildCreateView(readerId, selectedBookIds);
             }
 
-            // 2. Check if currently borrows > 5 books
+            // 2. Check if currently borrows > MaxBooks
+            var settings = GetSettings();
             var activeBorrowedCount = reader.BorrowTickets
                 .Where(t => t.Status != "Returned")
                 .SelectMany(t => t.BorrowDetails)
                 .Count(d => d.ReturnDate == null);
 
-            if (activeBorrowedCount + selectedBookIds.Length > 5)
+            if (activeBorrowedCount + selectedBookIds.Length > settings.MaxBooks)
             {
-                ModelState.AddModelError("", $"Độc giả đang mượn {activeBorrowedCount} cuốn sách. Tổng số lượng mượn tối đa là 5 cuốn. Đã chọn thêm {selectedBookIds.Length} cuốn.");
+                ModelState.AddModelError("", $"Độc giả đang mượn {activeBorrowedCount} cuốn sách. Tổng số lượng mượn tối đa là {settings.MaxBooks} cuốn. Đã chọn thêm {selectedBookIds.Length} cuốn.");
                 return await RebuildCreateView(readerId, selectedBookIds);
             }
 
@@ -222,7 +245,8 @@ namespace LibraryManagement1.Controllers
                 var lateDays = (returnDate.Date - detail.BorrowTicket.DueDate.Date).Days;
                 if (lateDays > 0)
                 {
-                    detail.FineAmount = lateDays * FINE_PER_DAY;
+                    var settings = GetSettings();
+                    detail.FineAmount = lateDays * (decimal)settings.FinePerDay;
                 }
             }
 
@@ -262,6 +286,10 @@ namespace LibraryManagement1.Controllers
 
         private async Task<IActionResult> RebuildCreateView(int readerId, int[]? selectedBookIds)
         {
+            var settings = GetSettings();
+            ViewBag.MaxBooks = settings.MaxBooks;
+            ViewBag.MaxBorrowDays = settings.MaxBorrowDays;
+
             var activeReaders = await _context.Readers
                 .Where(r => r.ExpiryDate >= DateTime.Now)
                 .ToListAsync();

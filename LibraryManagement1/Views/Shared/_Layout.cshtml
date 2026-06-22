@@ -32,9 +32,15 @@
                 <nav class="flex-grow-1">
                     <ul class="nav-menu">
                         <li class="nav-menu-item" id="nav-dashboard">
-                            <a asp-controller="Home" asp-action="Index">
+                            <a asp-controller="Home" asp-action="Dashboard">
                                 <i class="bi bi-speedometer2"></i>
                                 <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item">
+                            <a asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-globe"></i>
+                                <span>Xem Trang Web</span>
                             </a>
                         </li>
                         <li class="nav-menu-item" id="nav-books">
@@ -79,12 +85,39 @@
                                 <span>Quản lý Tiền phạt</span>
                             </a>
                         </li>
+                        <li class="nav-menu-item" id="nav-report-category">
+                            <a asp-controller="Report" asp-action="CategoryReport">
+                                <i class="bi bi-graph-up-arrow"></i>
+                                <span>Báo cáo Thể loại</span>
+                            </a>
+                        </li>
+                        <li class="nav-menu-item" id="nav-report-overdue">
+                            <a asp-controller="Report" asp-action="OverdueReport">
+                                <i class="bi bi-calendar-x"></i>
+                                <span>Báo cáo Trễ hạn</span>
+                            </a>
+                        </li>
                         <li class="nav-menu-item" id="nav-database">
                             <a asp-controller="Home" asp-action="DatabaseSchema">
                                 <i class="bi bi-database-fill-gear"></i>
                                 <span>Thiết kế Database</span>
                             </a>
                         </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-menu-item" id="nav-users">
+                                <a asp-controller="User" asp-action="Index">
+                                    <i class="bi bi-person-gear"></i>
+                                    <span>Quản lý Nhân viên</span>
+                                </a>
+                            </li>
+                            <li class="nav-menu-item" id="nav-settings">
+                                <a asp-controller="Setting" asp-action="Index">
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Quy định Thư viện</span>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </nav>
 
@@ -150,7 +183,7 @@
             if (currentController === 'Home') {
                 if (currentAction === 'DatabaseSchema') {
                     $('#nav-database').addClass('active');
-                } else {
+                } else if (currentAction === 'Dashboard') {
                     $('#nav-dashboard').addClass('active');
                 }
             } else if (currentController === 'Book') {
@@ -167,6 +200,16 @@
                 $('#nav-borrow').addClass('active');
             } else if (currentController === 'Fine') {
                 $('#nav-fine').addClass('active');
+            } else if (currentController === 'Report') {
+                if (currentAction === 'CategoryReport') {
+                    $('#nav-report-category').addClass('active');
+                } else if (currentAction === 'OverdueReport') {
+                    $('#nav-report-overdue').addClass('active');
+                }
+            } else if (currentController === 'User') {
+                $('#nav-users').addClass('active');
+            } else if (currentController === 'Setting') {
+                $('#nav-settings').addClass('active');
             }
         });
     </script>

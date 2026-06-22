@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement1.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         private readonly LibraryDbContext _context;
@@ -16,7 +15,41 @@ namespace LibraryManagement1.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        // GET: Home/Index (Trang chủ công cộng / Web Interface)
+        [AllowAnonymous]
+        public async Task<IActionResult> Index(string searchString, int? categoryId)
+        {
+            var query = _context.Books
+                .Include(b => b.Category)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var lowerSearch = searchString.ToLower();
+                query = query.Where(b => 
+                    b.BookCode.ToLower().Contains(lowerSearch) || 
+                    b.Title.ToLower().Contains(lowerSearch) || 
+                    b.Author!.Name.ToLower().Contains(lowerSearch));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(b => b.CategoryId == categoryId.Value);
+            }
+
+            ViewData["Categories"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _context.Categories.ToListAsync(), "Id", "Name", categoryId);
+            ViewData["CurrentSearch"] = searchString;
+            ViewData["CurrentCategory"] = categoryId;
+
+            var books = await query.ToListAsync();
+            return View(books);
+        }
+
+        // GET: Home/Dashboard (Trang Dashboard quản trị)
+        [Authorize]
+        public async Task<IActionResult> Dashboard()
         {
             // 1. Stats calculations
             var totalBooks = await _context.Books.SumAsync(b => b.Quantity);
@@ -70,11 +103,13 @@ namespace LibraryManagement1.Controllers
             return View(recentActivities);
         }
 
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [Authorize]
         public IActionResult DatabaseSchema()
         {
             return View();

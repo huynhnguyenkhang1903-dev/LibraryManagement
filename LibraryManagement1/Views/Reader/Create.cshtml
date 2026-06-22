@@ -38,7 +38,7 @@
 
             <div class="col-md-6 mb-3">
                 <label asp-for="ExpiryDate" class="form-label">Ngày hết hạn thẻ</label>
-                <input asp-for="ExpiryDate" class="form-control" type="date" value="@DateTime.Now.AddYears(1).ToString("yyyy-MM-dd")" required />
+                <input asp-for="ExpiryDate" class="form-control" type="date" value="@DateTime.Now.AddMonths(ViewBag.CardExpiryMonths ?? 6).ToString("yyyy-MM-dd")" required />
                 <span asp-validation-for="ExpiryDate" class="text-danger fs-7"></span>
             </div>
         </div>

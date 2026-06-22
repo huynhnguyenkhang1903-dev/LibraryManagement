@@ -125,6 +125,26 @@ html, body {
     -webkit-text-fill-color: transparent;
 }
 
+.sidebar nav {
+    overflow-y: auto;
+    margin-right: -0.5rem;
+    padding-right: 0.5rem;
+}
+
+.sidebar nav::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar nav::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+.sidebar nav::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
 /* Navigation Links */
 .nav-menu {
     list-style: none;

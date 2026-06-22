@@ -28,13 +28,13 @@
 
             <div class="col-md-6 mb-3">
                 <label for="dueDate" class="form-label">Hạn trả hẹn trước</label>
-                <input type="date" name="dueDate" id="dueDate" class="form-control" value="@DateTime.Now.AddDays(14).ToString("yyyy-MM-dd")" required />
-                <small class="text-secondary">Mặc định thời hạn mượn sách là 14 ngày.</small>
+                <input type="date" name="dueDate" id="dueDate" class="form-control" value="@DateTime.Now.AddDays(ViewBag.MaxBorrowDays).ToString("yyyy-MM-dd")" required />
+                <small class="text-secondary">Mặc định thời hạn mượn sách là @ViewBag.MaxBorrowDays ngày.</small>
             </div>
         </div>
 
         <div class="mb-4">
-            <label class="form-label d-block">Chọn Sách Mượn (Tối đa 5 cuốn)</label>
+            <label class="form-label d-block">Chọn Sách Mượn (Tối đa @ViewBag.MaxBooks cuốn)</label>
             
             <!-- Quick book search in checklist -->
             <div class="input-group mb-3" style="max-width: 400px;">
@@ -66,7 +66,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-2">
-                <small class="text-secondary" id="selected-count">Đã chọn: 0 / 5 cuốn</small>
+                <small class="text-secondary" id="selected-count">Đã chọn: 0 / @ViewBag.MaxBooks cuốn</small>
                 <small class="text-danger d-none" id="max-warning">Đã đạt giới hạn tối đa mượn sách!</small>
             </div>
         </div>
@@ -91,12 +91,12 @@
                 });
             });
 
-            // Limit selection to 5 books
+            // Limit selection to MaxBooks
             $(".book-checkbox").on("change", function() {
                 var checkedCount = $(".book-checkbox:checked").length;
-                $("#selected-count").text("Đã chọn: " + checkedCount + " / 5 cuốn");
+                $("#selected-count").text("Đã chọn: " + checkedCount + " / @ViewBag.MaxBooks cuốn");
 
-                if (checkedCount >= 5) {
+                if (checkedCount >= @ViewBag.MaxBooks) {
                     $(".book-checkbox:not(:checked)").attr("disabled", true);
                     $("#max-warning").removeClass("d-none");
                 } else {

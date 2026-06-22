@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Thư Viện LibAdmin Pro</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom site CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+    <!-- Public Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3" style="background-color: #0f172a !important; border-bottom: 1px solid #1e293b;">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-book-half fs-3" style="color: var(--primary) !important;"></i>
+                <span class="fw-bold text-white fs-4" style="letter-spacing: 0.5px;">LIBADMIN PRO</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="publicNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 fw-500 @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active text-white" : "")" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 fw-500 @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Privacy" ? "active text-white" : "")" asp-controller="Home" asp-action="Privacy">Chính sách & Giới thiệu</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center gap-3">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        var currentFullName = User.FindFirst("FullName")?.Value ?? User.Identity.Name ?? "Thủ thư";
+                        <div class="d-none d-md-flex align-items-center gap-2 text-white-50 me-2">
+                            <span class="fs-7">Xin chào, <strong class="text-white">@currentFullName</strong></span>
+                        </div>
+                        <a asp-controller="Home" asp-action="Dashboard" class="btn btn-premium-primary">
+                            <i class="bi bi-speedometer2 me-2"></i>Vào Dashboard
+                        </a>
+                        <a asp-controller="Auth" asp-action="Logout" class="btn btn-sm btn-outline-danger border-0">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-premium-primary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập thủ thư
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="container py-5">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Public Footer -->
+    <footer class="py-4 border-top mt-5" style="background-color: #ffffff; border-color: var(--border-glass) !important;">
+        <div class="container text-center">
+            <p class="text-secondary mb-1">© @DateTime.Now.Year - Hệ thống Quản lý Thư viện Thống nhất LibAdmin Pro</p>
+            <p class="text-secondary fs-8 mb-0">Địa chỉ: 123 Đường Sách, TP. Hồ Chí Minh | Điện thoại: 0123 456 789</p>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,106 @@
+@model LibraryManagement1.Controllers.LibrarySettings
+
+@{
+    ViewData["Title"] = "Quy định Thư viện";
+}
+
+<div class="mb-4">
+    <h2 class="mb-1">Thay Đổi Quy Định Thư Viện</h2>
+    <p class="text-secondary mb-0">Cấu hình các tham số quy định chung để hệ thống tự động áp dụng khi lập phiếu mượn hoặc tính phạt</p>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="background-color: var(--success-glow); color: var(--success); border-left: 4px solid var(--success) !important;">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-8 col-xl-6">
+        <div class="glass-panel">
+            <h5 class="mb-4 border-bottom pb-2 border-secondary">
+                <i class="bi bi-gear-fill text-primary me-2"></i>Các tham số quy định
+            </h5>
+
+            <form asp-action="Save" method="post">
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-custom mb-4">
+                        <ul class="mb-0 ps-3">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label asp-for="CardExpiryMonths" class="form-label">Thời hạn hiệu lực của thẻ độc giả (tháng)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                            <i class="bi bi-calendar-range text-secondary"></i>
+                        </span>
+                        <input asp-for="CardExpiryMonths" type="number" class="form-control border-start-0 ps-0" min="1" required />
+                        <span class="input-group-text bg-transparent border-start-0 border-secondary" style="border-color: #cbd5e1 !important;">tháng</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MaxBorrowDays" class="form-label">Số ngày mượn tối đa của một phiếu mượn (ngày)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                            <i class="bi bi-clock-history text-secondary"></i>
+                        </span>
+                        <input asp-for="MaxBorrowDays" type="number" class="form-control border-start-0 ps-0" min="1" required />
+                        <span class="input-group-text bg-transparent border-start-0 border-secondary" style="border-color: #cbd5e1 !important;">ngày</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MaxBooks" class="form-label">Số lượng sách tối đa được mượn cùng lúc / phiếu</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                            <i class="bi bi-bookshelf text-secondary"></i>
+                        </span>
+                        <input asp-for="MaxBooks" type="number" class="form-control border-start-0 ps-0" min="1" required />
+                        <span class="input-group-text bg-transparent border-start-0 border-secondary" style="border-color: #cbd5e1 !important;">cuốn</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="FinePerDay" class="form-label">Mức tiền phạt trễ hạn mỗi ngày (đồng/ngày)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                            <i class="bi bi-cash-coin text-secondary"></i>
+                        </span>
+                        <input asp-for="FinePerDay" type="number" class="form-control border-start-0 ps-0" min="0" step="100" required />
+                        <span class="input-group-text bg-transparent border-start-0 border-secondary" style="border-color: #cbd5e1 !important;">đ/ngày</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-premium-primary flex-grow-1">
+                        <i class="bi bi-save me-1"></i>Lưu quy định mới
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-xl-6">
+        <div class="glass-panel" style="background: rgba(37, 99, 235, 0.02);">
+            <h5 class="mb-3 fw-bold text-primary"><i class="bi bi-info-circle-fill me-2"></i>Hướng dẫn quy định</h5>
+            <ul class="text-secondary ps-3 mb-0" style="line-height: 1.6;">
+                <li class="mb-2"><strong>Thời hạn thẻ độc giả:</strong> Dùng để tính toán tự động ngày hết hạn của thẻ độc giả kể từ lúc tạo mới thẻ ở phần Quản lý độc giả.</li>
+                <li class="mb-2"><strong>Số ngày mượn tối đa:</strong> Giúp hệ thống tự tính hạn trả khi lập phiếu mượn sách. Mặc định là 14 ngày.</li>
+                <li class="mb-2"><strong>Số sách mượn tối đa:</strong> Ràng buộc chặt chẽ lúc lập phiếu mượn, tránh trường hợp độc giả mượn quá số sách quy định.</li>
+                <li><strong>Mức tiền phạt trễ hạn:</strong> Dùng để tự động tính tổng tiền phạt khi nhận trả sách trễ hạn.</li>
+            </ul>
+        </div>
+    </div>
+</div>

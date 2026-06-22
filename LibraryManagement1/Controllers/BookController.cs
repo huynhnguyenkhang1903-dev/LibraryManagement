@@ -54,6 +54,41 @@ namespace LibraryManagement1.Controllers
             return View(await query.ToListAsync());
         }
 
+        // GET: Book/Details/5
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var book = await _context.Books
+                .Include(b => b.Category)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            
+            if (book == null) return NotFound();
+
+            // Fetch borrowing history / current active borrow details for this book
+            var activeBorrows = await _context.BorrowDetails
+                .Include(d => d.BorrowTicket)
+                .ThenInclude(t => t!.Reader)
+                .Where(d => d.BookId == id && d.ReturnDate == null)
+                .ToListAsync();
+
+            var pastBorrows = await _context.BorrowDetails
+                .Include(d => d.BorrowTicket)
+                .ThenInclude(t => t!.Reader)
+                .Where(d => d.BookId == id && d.ReturnDate != null)
+                .OrderByDescending(d => d.ReturnDate)
+                .Take(10)
+                .ToListAsync();
+
+            ViewBag.ActiveBorrows = activeBorrows;
+            ViewBag.PastBorrows = pastBorrows;
+
+            return View(book);
+        }
+
         // GET: Book/Create
         public async Task<IActionResult> Create()
         {

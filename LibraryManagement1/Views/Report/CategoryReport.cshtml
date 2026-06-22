@@ -1,0 +1,80 @@
+@model IEnumerable<LibraryManagement1.Controllers.CategoryReportRow>
+
+@{
+    ViewData["Title"] = "Báo cáo Thể loại Sách";
+    var totalBorrows = ViewBag.TotalBorrows;
+    var stt = 1;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+    <div>
+        <h2 class="mb-1">Báo Cáo Mượn Sách Theo Thể Loại</h2>
+        <p class="text-secondary mb-0">Thống kê mật độ mượn trả sách phân chia theo từng thể loại</p>
+    </div>
+    <button onclick="window.print()" class="btn btn-premium-primary">
+        <i class="bi bi-printer me-2"></i>In báo cáo
+    </button>
+</div>
+
+<!-- Print Header (Hidden on screen) -->
+<div class="d-none d-print-block text-center mb-5">
+    <h3>THƯ VIỆN LIBADMIN PRO</h3>
+    <h2>BÁO CÁO TÌNH HÌNH MƯỢN SÁCH THEO THỂ LOẠI</h2>
+    <p class="text-secondary">Ngày lập báo cáo: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+    <hr />
+</div>
+
+<div class="glass-panel stat-card primary mb-4 d-print-inline-block w-100">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <span class="text-secondary d-block fs-8 mb-1">Tổng Số Lượt Mượn Sách Toàn Hệ Thống</span>
+            <h2 class="fw-bold text-dark mb-0">@totalBorrows <span class="fs-6 fw-normal text-secondary">lượt mượn</span></h2>
+        </div>
+        <div class="avatar bg-primary text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
+            <i class="bi bi-bar-chart-fill fs-4"></i>
+        </div>
+    </div>
+</div>
+
+<div class="glass-panel">
+    <h5 class="mb-4 border-bottom pb-2 border-secondary"><i class="bi bi-table text-primary me-2"></i>Bảng thống kê tỷ lệ mượn sách</h5>
+    <div class="table-responsive">
+        <table class="custom-table mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">STT</th>
+                    <th style="width: 45%;">Tên thể loại</th>
+                    <th style="width: 25%;">Số lượt mượn</th>
+                    <th style="width: 20%;" class="text-end">Tỷ lệ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-secondary py-4">Chưa ghi nhận lượt mượn sách nào.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(stt++)</td>
+                            <td class="fw-bold text-dark">@item.CategoryName</td>
+                            <td class="fw-bold">@item.BorrowCount</td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end align-items-center gap-2">
+                                    <div class="progress d-none d-md-flex" style="width: 100px; height: 6px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: @item.Percentage%" aria-valuenow="@item.Percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <span class="fw-bold text-primary">@item.Percentage %</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

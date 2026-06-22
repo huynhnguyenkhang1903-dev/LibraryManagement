@@ -1,0 +1,6 @@
+{
+  "CardExpiryMonths": 6,
+  "MaxBorrowDays": 14,
+  "MaxBooks": 5,
+  "FinePerDay": 1000.0
+}
