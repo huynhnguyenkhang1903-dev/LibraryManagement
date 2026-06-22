@@ -12,10 +12,11 @@
 </div>
 
 <div class="glass-panel">
-    <form asp-action="Edit">
+    <form asp-action="Edit" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="alert alert-custom mb-3"></div>
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="AvailableQuantity" />
+        <input type="hidden" asp-for="ImageUrl" />
 
         <div class="row">
             <div class="col-md-6 mb-3">
@@ -81,9 +82,15 @@
 
         <div class="row">
             <div class="col-md-12 mb-3">
-                <label asp-for="ImageUrl" class="form-label">Đường dẫn ảnh bìa sách (URL)</label>
-                <input asp-for="ImageUrl" class="form-control" placeholder="Ví dụ: https://example.com/cover.jpg (Để trống sẽ dùng ảnh mặc định)" />
-                <span asp-validation-for="ImageUrl" class="text-danger fs-7"></span>
+                <label class="form-label">Chọn tệp ảnh bìa sách thay thế</label>
+                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="mt-2">
+                        <span class="text-muted fs-8">Ảnh hiện tại:</span>
+                        <img src="@Model.ImageUrl" alt="Current Cover" style="max-height: 80px; display: block; border-radius: 4px; margin-top: 5px;" />
+                    </div>
+                }
             </div>
         </div>
 

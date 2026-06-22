@@ -1,8 +1,11 @@
 using LibraryManagement1.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace LibraryManagement1.Controllers
 {
@@ -10,10 +13,12 @@ namespace LibraryManagement1.Controllers
     public class BookController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BookController(LibraryDbContext context)
+        public BookController(LibraryDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Book
@@ -101,7 +106,7 @@ namespace LibraryManagement1.Controllers
         // POST: Book/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,Quantity,Price,ImageUrl")] Book book)
+        public async Task<IActionResult> Create([Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,Quantity,Price")] Book book, IFormFile? ImageFile)
         {
             if (ModelState.IsValid)
             {
@@ -113,6 +118,22 @@ namespace LibraryManagement1.Controllers
                 }
                 else
                 {
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(stream);
+                        }
+                        book.ImageUrl = "/uploads/" + fileName;
+                    }
+
                     book.AvailableQuantity = book.Quantity; // Initially, all books are available
                     _context.Add(book);
                     await _context.SaveChangesAsync();
@@ -143,7 +164,7 @@ namespace LibraryManagement1.Controllers
         // POST: Book/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,AvailableQuantity,Quantity,Price,ImageUrl")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,AvailableQuantity,Quantity,Price,ImageUrl")] Book book, IFormFile? ImageFile)
         {
             if (id != book.Id) return NotFound();
 
@@ -151,6 +172,22 @@ namespace LibraryManagement1.Controllers
             {
                 try
                 {
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(stream);
+                        }
+                        book.ImageUrl = "/uploads/" + fileName;
+                    }
+
                     // Basic sanity check: AvailableQuantity cannot exceed Quantity
                     if (book.AvailableQuantity > book.Quantity)
                     {

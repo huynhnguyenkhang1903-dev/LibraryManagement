@@ -12,7 +12,7 @@
 </div>
 
 <div class="glass-panel">
-    <form asp-action="Create">
+    <form asp-action="Create" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="alert alert-custom mb-3"></div>
 
         <div class="row">
@@ -77,9 +77,9 @@
 
         <div class="row">
             <div class="col-md-12 mb-3">
-                <label asp-for="ImageUrl" class="form-label">Đường dẫn ảnh bìa sách (URL)</label>
-                <input asp-for="ImageUrl" class="form-control" placeholder="Ví dụ: https://example.com/cover.jpg (Để trống sẽ dùng ảnh mặc định)" />
-                <span asp-validation-for="ImageUrl" class="text-danger fs-7"></span>
+                <label class="form-label">Tệp ảnh bìa sách</label>
+                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                <span class="text-muted fs-8">Nếu bỏ trống, hệ thống sẽ sử dụng ảnh mặc định.</span>
             </div>
         </div>
 
