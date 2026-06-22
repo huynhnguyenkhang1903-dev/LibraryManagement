@@ -76,6 +76,12 @@ namespace LibraryManagement1.Models
         {
             context.Database.EnsureCreated();
 
+            try
+            {
+                context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Books') AND name = 'ImageUrl') ALTER TABLE Books ADD ImageUrl NVARCHAR(500) NULL;");
+            }
+            catch { }
+
             if (context.Users.Any())
             {
                 return; // DB has been seeded
@@ -126,11 +132,11 @@ namespace LibraryManagement1.Models
             // Seed Books
             var books = new List<Book>
             {
-                new Book { BookCode = "MS001", Title = "Clean Code: A Handbook of Agile Software Craftsmanship", CategoryId = categories[0].Id, AuthorId = authors[0].Id, PublisherId = publishers[2].Id, PublishYear = 2008, Quantity = 10, AvailableQuantity = 9, Price = 150000 },
-                new Book { BookCode = "MS002", Title = "Mắt Biếc", CategoryId = categories[1].Id, AuthorId = authors[1].Id, PublisherId = publishers[0].Id, PublishYear = 1990, Quantity = 15, AvailableQuantity = 13, Price = 95000 },
-                new Book { BookCode = "MS003", Title = "Đắc Nhân Tâm (How to Win Friends and Influence People)", CategoryId = categories[4].Id, AuthorId = authors[2].Id, PublisherId = publishers[1].Id, PublishYear = 1936, Quantity = 20, AvailableQuantity = 19, Price = 86000 },
-                new Book { BookCode = "MS004", Title = "Cơ sở dữ liệu lớn và AI", CategoryId = categories[0].Id, AuthorId = authors[0].Id, PublisherId = publishers[2].Id, PublishYear = 2021, Quantity = 5, AvailableQuantity = 5, Price = 230000 },
-                new Book { BookCode = "MS005", Title = "Cho tôi xin một vé đi tuổi thơ", CategoryId = categories[1].Id, AuthorId = authors[1].Id, PublisherId = publishers[0].Id, PublishYear = 2008, Quantity = 12, AvailableQuantity = 12, Price = 88000 }
+                new Book { BookCode = "MS001", Title = "Clean Code: A Handbook of Agile Software Craftsmanship", CategoryId = categories[0].Id, AuthorId = authors[0].Id, PublisherId = publishers[2].Id, PublishYear = 2008, Quantity = 10, AvailableQuantity = 9, Price = 150000, ImageUrl = "https://images-na.ssl-images-amazon.com/images/I/41xShCOh3mL._SX218_BO1,204,203,200_QL40_FMwebp_.jpg" },
+                new Book { BookCode = "MS002", Title = "Mắt Biếc", CategoryId = categories[1].Id, AuthorId = authors[1].Id, PublisherId = publishers[0].Id, PublishYear = 1990, Quantity = 15, AvailableQuantity = 13, Price = 95000, ImageUrl = "https://bizweb.dktcdn.net/100/197/269/products/mat-biec-bia-2019-1.jpg?v=1574068595460" },
+                new Book { BookCode = "MS003", Title = "Đắc Nhân Tâm (How to Win Friends and Influence People)", CategoryId = categories[4].Id, AuthorId = authors[2].Id, PublisherId = publishers[1].Id, PublishYear = 1936, Quantity = 20, AvailableQuantity = 19, Price = 86000, ImageUrl = "https://bizweb.dktcdn.net/100/197/269/products/dac-nhan-tam-kho-lon.jpg?v=1522033060197" },
+                new Book { BookCode = "MS004", Title = "Cơ sở dữ liệu lớn và AI", CategoryId = categories[0].Id, AuthorId = authors[0].Id, PublisherId = publishers[2].Id, PublishYear = 2021, Quantity = 5, AvailableQuantity = 5, Price = 230000, ImageUrl = "https://m.media-amazon.com/images/I/81P8H8fD2BL._AC_UF1000,1000_QL80_.jpg" },
+                new Book { BookCode = "MS005", Title = "Cho tôi xin một vé đi tuổi thơ", CategoryId = categories[1].Id, AuthorId = authors[1].Id, PublisherId = publishers[0].Id, PublishYear = 2008, Quantity = 12, AvailableQuantity = 12, Price = 88000, ImageUrl = "https://bizweb.dktcdn.net/100/197/269/products/cho-toi-xin-mot-ve-di-tuoi-tho-bia-mem-tai-ban-2018.jpg?v=1527756181747" }
             };
             context.Books.AddRange(books);
             context.SaveChanges();

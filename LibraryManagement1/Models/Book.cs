@@ -53,5 +53,9 @@ namespace LibraryManagement1.Models
         [Range(0, 100000000, ErrorMessage = "Giá tiền không hợp lệ")]
         [Display(Name = "Giá sách")]
         public decimal Price { get; set; }
+
+        [StringLength(500)]
+        [Display(Name = "Ảnh bìa sách (URL)")]
+        public string? ImageUrl { get; set; }
     }
 }

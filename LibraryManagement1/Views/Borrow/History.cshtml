@@ -1,0 +1,110 @@
+@model IEnumerable<LibraryManagement1.Models.BorrowTicket>
+
+@{
+    Layout = "_PublicLayout";
+    ViewData["Title"] = "Lịch sử mượn sách";
+}
+
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <a asp-controller="Home" asp-action="Index" class="text-secondary text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại trang chủ
+        </a>
+        <h2 class="mt-2 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Lịch Sử Mượn Sách Của Bạn</h2>
+        <p class="text-secondary mb-0 fs-7">Xem lại toàn bộ danh sách phiếu mượn và trạng thái sách đã đăng ký</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success border-0 shadow-sm mb-4" style="background-color: var(--success-glow); color: var(--success); border-left: 4px solid var(--success) !important;">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="glass-panel">
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-clipboard-x fs-1 text-secondary mb-3 d-block"></i>
+            <h5 class="text-secondary fw-bold">Bạn chưa mượn cuốn sách nào</h5>
+            <p class="text-muted mb-4 fs-7">Hãy quay lại trang chủ và chọn cuốn sách bạn yêu thích để đăng ký mượn nhé.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-premium-primary px-4">
+                <i class="bi bi-search me-2"></i>Tra cứu sách ngay
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="custom-table mb-0">
+                <thead>
+                    <tr class="fs-8">
+                        <th style="width: 15%;">Mã phiếu mượn</th>
+                        <th style="width: 40%;">Sách mượn</th>
+                        <th style="width: 15%;">Ngày mượn</th>
+                        <th style="width: 15%;">Hạn trả</th>
+                        <th style="width: 15%;" class="text-end">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody class="fs-7">
+                    @foreach (var ticket in Model)
+                    {
+                        var isOverdue = ticket.Status == "Overdue";
+                        var isReturned = ticket.Status == "Returned";
+                        
+                        <tr>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@ticket.Id" class="fw-bold text-primary text-decoration-none">
+                                    @ticket.TicketCode
+                                </a>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column gap-2 py-1">
+                                    @foreach (var detail in ticket.BorrowDetails)
+                                    {
+                                        var book = detail.Book;
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="@(string.IsNullOrEmpty(book?.ImageUrl) ? "/images/default_book_cover.png" : book.ImageUrl)" class="img-thumbnail rounded" alt="Bìa sách" style="width: 30px; height: 42px; object-fit: cover;" />
+                                            <div>
+                                                <div class="fw-500 text-dark text-truncate" style="max-width: 250px;">@(book?.Title ?? "N/A")</div>
+                                                @if (detail.ReturnDate.HasValue)
+                                                {
+                                                    <span class="text-success fs-9"><i class="bi bi-check-circle-fill me-1"></i>Đã trả (@detail.ReturnDate.Value.ToString("dd/MM/yyyy"))</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-warning fs-9"><i class="bi bi-clock me-1"></i>Đang giữ</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                            <td class="text-secondary">@ticket.BorrowDate.ToString("dd/MM/yyyy")</td>
+                            <td class="text-secondary @(isOverdue ? "text-danger fw-bold" : "")">
+                                @ticket.DueDate.ToString("dd/MM/yyyy")
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex flex-column align-items-end gap-2">
+                                    <span class="status-badge @(isReturned ? "returned" : isOverdue ? "overdue" : "borrowing") fs-8">
+                                        @if (isReturned) {
+                                            <span>Đã trả hết</span>
+                                        } else if (isOverdue) {
+                                            <span>Quá hạn</span>
+                                        } else {
+                                            <span>Đang mượn</span>
+                                        }
+                                    </span>
+                                    <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-sm btn-premium-secondary fs-9 py-1 px-2.5">
+                                        <i class="bi bi-eye me-1"></i>Chi tiết
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

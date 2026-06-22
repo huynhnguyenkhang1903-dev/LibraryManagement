@@ -6,7 +6,7 @@
     var pastBorrows = ViewBag.PastBorrows as IEnumerable<LibraryManagement1.Models.BorrowDetail> ?? new List<LibraryManagement1.Models.BorrowDetail>();
     var isAvailable = Model.AvailableQuantity > 0;
 
-    if (User.Identity?.IsAuthenticated == true)
+    if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Staff")))
     {
         Layout = "_Layout";
     }
@@ -17,7 +17,7 @@
 }
 
 <div class="mb-4">
-    @if (User.Identity?.IsAuthenticated == true)
+    @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Staff")))
     {
         <a asp-action="Index" class="text-secondary text-decoration-none">
             <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách sách
@@ -37,7 +37,7 @@
     <div class="col-lg-4">
         <div class="glass-panel text-center mb-4">
             <div class="position-relative d-inline-block mb-3">
-                <img src="~/images/default_book_cover.png" class="book-thumbnail-large img-thumbnail" alt="Bìa sách" style="width: 150px; height: 210px; object-fit: cover;" />
+                <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? Url.Content("~/images/default_book_cover.png") : Model.ImageUrl)" class="book-thumbnail-large img-thumbnail" alt="Bìa sách" style="width: 150px; height: 210px; object-fit: cover;" />
                 @if (isAvailable)
                 {
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success px-2 py-1" style="font-size: 0.75rem;">
@@ -55,7 +55,7 @@
             <h5 class="fw-bold mb-1">@Model.Title</h5>
             <p class="text-secondary fs-8 mb-4">Mã sách: <span class="text-primary fw-bold">@Model.BookCode</span></p>
 
-            @if (User.Identity?.IsAuthenticated == true)
+            @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Staff")))
             {
                 <div class="d-flex flex-column gap-2">
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-premium-primary">
@@ -64,6 +64,23 @@
                     <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-premium-danger">
                         <i class="bi bi-trash me-2"></i>Xóa cuốn sách này
                     </a>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-2">
+                    @if (isAvailable)
+                    {
+                        <a asp-controller="Borrow" asp-action="CustomerBorrow" asp-route-bookId="@Model.Id" class="btn btn-premium-primary">
+                            <i class="bi bi-bookmark-plus-fill me-2"></i>Mượn cuốn sách này
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary border-0 text-muted w-100" disabled style="background: rgba(0,0,0,0.05);">
+                            <i class="bi bi-bookmark-x-fill me-2"></i>Hết sách khả dụng
+                        </button>
+                    }
                 </div>
             }
         </div>
@@ -152,7 +169,7 @@
     </div>
 </div>
 
-@if (User.Identity?.IsAuthenticated == true)
+@if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Staff")))
 {
     <!-- Active Borrows Section -->
     <div class="glass-panel mt-4">

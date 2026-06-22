@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement1.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Staff")]
     public class BookController : Controller
     {
         private readonly LibraryDbContext _context;
@@ -101,7 +101,7 @@ namespace LibraryManagement1.Controllers
         // POST: Book/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,Quantity,Price")] Book book)
+        public async Task<IActionResult> Create([Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,Quantity,Price,ImageUrl")] Book book)
         {
             if (ModelState.IsValid)
             {
@@ -143,7 +143,7 @@ namespace LibraryManagement1.Controllers
         // POST: Book/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,Quantity,AvailableQuantity,Price")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BookCode,Title,CategoryId,AuthorId,PublisherId,PublishYear,AvailableQuantity,Quantity,Price,ImageUrl")] Book book)
         {
             if (id != book.Id) return NotFound();
 

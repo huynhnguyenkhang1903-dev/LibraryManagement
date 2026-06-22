@@ -16,7 +16,7 @@
 </head>
 <body>
 
-    @if (User.Identity?.IsAuthenticated == true)
+    @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Staff")))
     {
         var currentRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Staff";
         var currentFullName = User.FindFirst("FullName")?.Value ?? User.Identity.Name ?? "Thủ thư";
@@ -108,7 +108,7 @@
                             <li class="nav-menu-item" id="nav-users">
                                 <a asp-controller="User" asp-action="Index">
                                     <i class="bi bi-person-gear"></i>
-                                    <span>Quản lý Nhân viên</span>
+                                    <span>Quản lý Tài khoản</span>
                                 </a>
                             </li>
                             <li class="nav-menu-item" id="nav-settings">

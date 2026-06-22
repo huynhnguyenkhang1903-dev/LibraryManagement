@@ -34,6 +34,12 @@
                     <li class="nav-item">
                         <a class="nav-link text-white-50 fw-500 @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Privacy" ? "active text-white" : "")" asp-controller="Home" asp-action="Privacy">Chính sách & Giới thiệu</a>
                     </li>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white-50 fw-500 @(ViewContext.RouteData.Values["controller"]?.ToString() == "Borrow" && ViewContext.RouteData.Values["action"]?.ToString() == "History" ? "active text-white" : "")" asp-controller="Borrow" asp-action="History">Lịch sử mượn</a>
+                        </li>
+                    }
                 </ul>
                 
                 <div class="d-flex align-items-center gap-3">
@@ -43,9 +49,12 @@
                         <div class="d-none d-md-flex align-items-center gap-2 text-white-50 me-2">
                             <span class="fs-7">Xin chào, <strong class="text-white">@currentFullName</strong></span>
                         </div>
-                        <a asp-controller="Home" asp-action="Dashboard" class="btn btn-premium-primary">
-                            <i class="bi bi-speedometer2 me-2"></i>Vào Dashboard
-                        </a>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                        {
+                            <a asp-controller="Home" asp-action="Dashboard" class="btn btn-premium-primary">
+                                <i class="bi bi-speedometer2 me-2"></i>Vào Dashboard
+                            </a>
+                        }
                         <a asp-controller="Auth" asp-action="Logout" class="btn btn-sm btn-outline-danger border-0">
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
@@ -53,7 +62,7 @@
                     else
                     {
                         <a asp-controller="Auth" asp-action="Login" class="btn btn-premium-primary">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập thủ thư
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập
                         </a>
                     }
                 </div>

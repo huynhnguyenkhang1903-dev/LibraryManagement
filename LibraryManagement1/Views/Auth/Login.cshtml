@@ -11,6 +11,13 @@
             <p class="text-secondary fs-6">Hệ thống Quản lý Thư viện Ấm cúng</p>
         </div>
 
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success border-0 shadow-sm text-start mb-3" style="background-color: var(--success-glow); color: var(--success); border-left: 4px solid var(--success) !important;">
+                <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            </div>
+        }
+
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="alert alert-custom mb-3 text-start">
@@ -49,6 +56,11 @@
                 Đăng nhập
             </button>
         </form>
+
+        <div class="mt-4 text-center">
+            <span class="text-secondary fs-7">Chưa có tài khoản?</span>
+            <a asp-action="Register" class="text-primary fs-7 text-decoration-none fw-bold ms-1">Đăng ký ngay</a>
+        </div>
 
         <div class="mt-4 pt-3 border-top border-secondary" style="opacity: 0.3;">
             <p class="text-secondary fs-8 mb-0">&copy; 2026 LibAdmin. All rights reserved.</p>

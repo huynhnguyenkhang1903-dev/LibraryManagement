@@ -1,0 +1,368 @@
+@model LibraryManagement1.Models.Reader
+@{
+    Layout = "_PublicLayout";
+    ViewData["Title"] = "Đăng ký mượn sách";
+    var initialBook = ViewBag.Book as LibraryManagement1.Models.Book ?? new LibraryManagement1.Models.Book();
+    var user = ViewBag.User as LibraryManagement1.Models.User ?? new LibraryManagement1.Models.User();
+    var settings = ViewBag.Settings as LibraryManagement1.Controllers.LibrarySettings ?? new LibraryManagement1.Controllers.LibrarySettings();
+    var isNewReader = ViewBag.Reader == null;
+    var availableBooks = ViewBag.AvailableBooks as List<LibraryManagement1.Models.Book> ?? new List<LibraryManagement1.Models.Book>();
+    var selectedBookIds = ViewBag.SelectedBookIds as int[] ?? new int[] { initialBook.Id };
+    var activeReaderObj = ViewBag.Reader as LibraryManagement1.Models.Reader ?? new LibraryManagement1.Models.Reader();
+}
+
+<div class="mb-4">
+    <a asp-controller="Book" asp-action="Details" asp-route-id="@initialBook.Id" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại chi tiết sách
+    </a>
+    <h2 class="mt-2">Đăng Ký Mượn Sách</h2>
+</div>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-custom mb-4 text-start">
+        <ul class="mb-0 ps-3">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<div class="row">
+    <!-- Left panel: Selected Books List -->
+    <div class="col-lg-6 mb-4">
+        <div class="glass-panel h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2 border-secondary">
+                <h5 class="mb-0"><i class="bi bi-book-half text-primary me-2"></i>Danh sách sách đăng ký mượn</h5>
+                <span class="badge bg-primary fs-8" id="book-count-badge">1 cuốn</span>
+            </div>
+
+            <!-- Add book search tools -->
+            <div class="card p-3 mb-4 border-secondary bg-light" style="border-color: rgba(0,0,0,0.08) !important; border-radius: 8px;">
+                <label class="form-label fw-bold text-dark fs-7 mb-2"><i class="bi bi-plus-circle-fill text-success me-1"></i>Thêm sách khác muốn mượn cùng:</label>
+                <div class="d-flex gap-2">
+                    <select id="addBookSelect" class="form-select fs-7">
+                        <option value="">-- Chọn cuốn sách khác --</option>
+                        @foreach (var b in availableBooks)
+                        {
+                            if (b.Id != initialBook.Id)
+                            {
+                                <option value="@b.Id" data-title="@b.Title" data-code="@b.BookCode" data-author="@(b.Author?.Name ?? "N/A")" data-image="@(string.IsNullOrEmpty(b.ImageUrl) ? "/images/default_book_cover.png" : b.ImageUrl)">
+                                    @b.Title (@b.BookCode) - Còn @b.AvailableQuantity cuốn
+                                </option>
+                            }
+                        }
+                    </select>
+                    <button type="button" id="btnAddBook" class="btn btn-premium-secondary px-3 py-2 text-nowrap fs-7">
+                        <i class="bi bi-plus-lg me-1"></i>Thêm
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selected Books Table -->
+            <div class="table-responsive">
+                <table class="table align-middle" id="selectedBooksTable">
+                    <thead>
+                        <tr class="text-secondary fs-8">
+                            <th style="width: 60px;">Bìa</th>
+                            <th>Thông tin sách</th>
+                            <th style="width: 80px;" class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selectedBooksBody" class="fs-7">
+                        <!-- Initial book injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right panel: Borrow Form / Reader Info -->
+    <div class="col-lg-6">
+        <div class="glass-panel">
+            <form asp-action="CustomerBorrow" method="post" id="borrowForm">
+                @Html.AntiForgeryToken()
+                
+                <!-- Container for dynamically injected book ID inputs -->
+                <div id="hiddenBookInputsContainer"></div>
+
+                @if (isNewReader)
+                {
+                    <h5 class="mb-4 border-bottom pb-2 border-secondary text-warning">
+                        <i class="bi bi-card-checklist me-2"></i>Kích hoạt Thẻ thư viện
+                    </h5>
+                    <div class="alert alert-warning border-0 mb-4" style="background-color: rgba(245, 158, 11, 0.1); color: #d97706;">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Chào **@user.FullName**! Đây là lần đầu tiên bạn mượn sách. Vui lòng điền thông tin bên dưới để hệ thống kích hoạt thẻ thư viện của bạn.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary fs-8">Họ tên độc giả</label>
+                        <input class="form-control bg-light text-muted border-secondary fs-7" value="@user.FullName" readonly style="border-color: #cbd5e1 !important;" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label fs-7">Số điện thoại <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                                <i class="bi bi-telephone text-secondary"></i>
+                            </span>
+                            <input type="text" id="phone" name="phone" class="form-control border-start-0 ps-0 fs-7" placeholder="Nhập số điện thoại liên lạc" required value="@ViewBag.Phone" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="birthDate" class="form-label fs-7">Ngày sinh <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                                <i class="bi bi-calendar-event text-secondary"></i>
+                            </span>
+                            <input type="date" id="birthDate" name="birthDate" class="form-control border-start-0 ps-0 fs-7" required value="@ViewBag.BirthDate" />
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <h5 class="mb-4 border-bottom pb-2 border-secondary text-success">
+                        <i class="bi bi-person-check-fill me-2"></i>Thông tin Thẻ thư viện
+                    </h5>
+                    
+                    <div class="card p-3 mb-4 border-secondary bg-light fs-7" style="border-color: rgba(0,0,0,0.08) !important; border-radius: 8px;">
+                        <ul class="list-unstyled mb-0 gap-2 d-flex flex-column">
+                            <li class="d-flex justify-content-between">
+                                <span class="text-secondary">Độc giả:</span>
+                                <strong class="text-dark">@activeReaderObj.Name</strong>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span class="text-secondary">Mã thẻ thư viện:</span>
+                                <strong class="text-primary">@activeReaderObj.ReaderCode</strong>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span class="text-secondary">Hạn sử dụng thẻ:</span>
+                                <span class="text-dark">@activeReaderObj.ExpiryDate.ToString("dd/MM/yyyy")</span>
+                            </li>
+                        </ul>
+                    </div>
+                }
+
+                <!-- Date Picker Section (Always Visible for user to custom fill) -->
+                <h5 class="mb-4 border-bottom pb-2 border-secondary"><i class="bi bi-calendar-range text-primary me-2"></i>Thời gian mượn & trả</h5>
+                
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <label for="borrowDate" class="form-label fs-7">Ngày mượn sách <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                                <i class="bi bi-calendar3 text-secondary"></i>
+                            </span>
+                            <input type="date" id="borrowDate" name="borrowDate" class="form-control border-start-0 ps-0 fs-7" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <label for="dueDate" class="form-label fs-7">Ngày hẹn trả sách <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 border-secondary" style="border-color: #cbd5e1 !important;">
+                                <i class="bi bi-calendar3-event text-secondary"></i>
+                            </span>
+                            <input type="date" id="dueDate" name="dueDate" class="form-control border-start-0 ps-0 fs-7" required value="@DateTime.Now.AddDays(settings.MaxBorrowDays).ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-4 border-secondary bg-light fs-8" style="border-color: rgba(0,0,0,0.08) !important; border-radius: 8px;">
+                    <h6 class="fw-bold mb-2 text-dark fs-8"><i class="bi bi-info-circle text-primary me-1"></i>Lưu ý về quy định thư viện:</h6>
+                    <ul class="mb-0 ps-3 text-secondary">
+                        <li>Số lượng mượn tối đa: **@settings.MaxBooks** cuốn sách (bao gồm cả các sách bạn đang mượn chưa trả).</li>
+                        <li>Số ngày mượn tối đa cho một lượt: **@settings.MaxBorrowDays** ngày.</li>
+                        <li>Tiền phạt trả trễ: **@settings.FinePerDay.ToString("N0") đ** / cuốn / ngày.</li>
+                    </ul>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-premium-primary flex-grow-1 py-2.5 fs-6">
+                        <i class="bi bi-check-lg me-1"></i>Xác nhận đăng ký mượn
+                    </button>
+                    <a asp-controller="Book" asp-action="Details" asp-route-id="@initialBook.Id" class="btn btn-premium-secondary px-4 py-2.5">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JS state management for selected books list
+        let selectedBooks = [];
+        
+        // Settings loaded from backend view variables
+        const maxBooksLimit = @settings.MaxBooks;
+        const currentBorrowedCount = @(activeReaderObj != null ? activeReaderObj.BorrowTickets.Where(t => t.Status != "Returned").SelectMany(t => t.BorrowDetails).Count(d => d.ReturnDate == null) : 0);
+        const allowedBorrowCount = maxBooksLimit - currentBorrowedCount;
+
+        // Initialize with primary book clicked from details
+        const initialBookItem = {
+            id: @initialBook.Id,
+            title: "@Html.Raw(initialBook.Title)",
+            code: "@initialBook.BookCode",
+            author: "@Html.Raw(initialBook.Author?.Name ?? "N/A")",
+            image: "@(string.IsNullOrEmpty(initialBook.ImageUrl) ? "/images/default_book_cover.png" : initialBook.ImageUrl)"
+        };
+
+        $(document).ready(function() {
+            // Load selectedBookIds from backend (handles validation failure reload)
+            const preselectedIds = @Html.Raw(Json.Serialize(selectedBookIds));
+            
+            if (preselectedIds && preselectedIds.length > 0) {
+                // If it's a reload, rebuild the state from options
+                preselectedIds.forEach(function(id) {
+                    if (id === initialBookItem.id) {
+                        selectedBooks.push(initialBookItem);
+                    } else {
+                        // Find book details from the select element options
+                        const opt = $(`#addBookSelect option[value="${id}"]`);
+                        if (opt.length > 0) {
+                            selectedBooks.push({
+                                id: id,
+                                title: opt.data("title"),
+                                code: opt.data("code"),
+                                author: opt.data("author"),
+                                image: opt.data("image")
+                            });
+                        }
+                    }
+                });
+            } else {
+                selectedBooks.push(initialBookItem);
+            }
+
+            renderSelectedBooks();
+
+            // Add button click handler
+            $("#btnAddBook").click(function() {
+                const selectEl = $("#addBookSelect");
+                const bookId = selectEl.val();
+                if (!bookId) {
+                    alert("Vui lòng chọn một cuốn sách.");
+                    return;
+                }
+
+                // Check if already selected
+                if (selectedBooks.some(b => b.id == bookId)) {
+                    alert("Sách này đã nằm trong danh sách đăng ký mượn.");
+                    return;
+                }
+
+                // Check if exceeds limit
+                if (selectedBooks.length >= allowedBorrowCount) {
+                    alert(`Theo quy định, bạn chỉ được đăng ký mượn thêm tối đa ${allowedBorrowCount} cuốn sách (Bạn đang có ${currentBorrowedCount} cuốn mượn hoạt động).`);
+                    return;
+                }
+
+                const opt = selectEl.find("option:selected");
+                const bookObj = {
+                    id: parseInt(bookId),
+                    title: opt.data("title"),
+                    code: opt.data("code"),
+                    author: opt.data("author"),
+                    image: opt.data("image")
+                };
+
+                selectedBooks.push(bookObj);
+                renderSelectedBooks();
+                selectEl.val(""); // Reset select dropdown
+            });
+
+            // Form submission validation
+            $("#borrowForm").submit(function(e) {
+                if (selectedBooks.length === 0) {
+                    alert("Vui lòng chọn ít nhất 1 cuốn sách để mượn.");
+                    e.preventDefault();
+                    return;
+                }
+
+                const borrowDate = new Date($("#borrowDate").val());
+                const dueDate = new Date($("#dueDate").val());
+                
+                if (dueDate < borrowDate) {
+                    alert("Hạn trả sách không được trước ngày mượn.");
+                    e.preventDefault();
+                    return;
+                }
+
+                const diffTime = Math.abs(dueDate - borrowDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const maxDays = @settings.MaxBorrowDays;
+
+                if (diffDays <= 0) {
+                    alert("Thời gian mượn sách phải tối thiểu là 1 ngày.");
+                    e.preventDefault();
+                    return;
+                }
+
+                if (diffDays > maxDays) {
+                    alert(`Theo quy định, thời hạn mượn không vượt quá ${maxDays} ngày (Hiện đang là ${diffDays} ngày).`);
+                    e.preventDefault();
+                    return;
+                }
+            });
+        });
+
+        // Function to render selected books list in view and sync hidden inputs
+        function renderSelectedBooks() {
+            const tbody = $("#selectedBooksBody");
+            const inputsContainer = $("#hiddenBookInputsContainer");
+            
+            tbody.empty();
+            inputsContainer.empty();
+
+            if (selectedBooks.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-secondary">
+                            <i class="bi bi-journal-x fs-2 d-block mb-1"></i>
+                            Chưa chọn cuốn sách nào.
+                        </td>
+                    </tr>
+                `);
+                $("#book-count-badge").text("0 cuốn");
+                return;
+            }
+
+            selectedBooks.forEach(function(book) {
+                // Render table row
+                tbody.append(`
+                    <tr>
+                        <td>
+                            <img src="${book.image}" class="img-thumbnail" alt="Cover" style="width: 40px; height: 55px; object-fit: cover;" />
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark text-truncate" style="max-width: 250px;">${book.title}</div>
+                            <div class="text-secondary fs-8">Mã: <strong class="text-primary">${book.code}</strong> | Tác giả: ${book.author}</div>
+                        </td>
+                        <td class="text-end">
+                            ${book.id == @initialBook.Id ? '<span class="badge bg-secondary text-secondary-50 fs-9 px-2 py-1">Gốc</span>' : `
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0 p-1" onclick="removeBook(${book.id})" title="Xóa khỏi danh sách">
+                                    <i class="bi bi-trash fs-6"></i>
+                                </button>
+                            `}
+                        </td>
+                    </tr>
+                `);
+
+                // Append hidden input for POST form binding
+                inputsContainer.append(`<input type="hidden" name="selectedBookIds" value="${book.id}" />`);
+            });
+
+            $("#book-count-badge").text(`${selectedBooks.length} cuốn`);
+        }
+
+        // Global helper function for deleting from array
+        function removeBook(id) {
+            selectedBooks = selectedBooks.filter(b => b.id !== id);
+            renderSelectedBooks();
+        }
+    </script>
+}

@@ -6,11 +6,27 @@
 }
 
 <div class="mb-4">
-    <a asp-action="Index" class="text-secondary text-decoration-none">
-        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
-    </a>
+    @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+    {
+        <a asp-action="Index" class="text-secondary text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    }
+    else
+    {
+        <a asp-action="History" class="text-secondary text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại lịch sử mượn
+        </a>
+    }
     <h2 class="mt-2">Chi Tiết Phiếu Mượn: @Model.TicketCode</h2>
 </div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success border-0 shadow-sm mb-4" style="background-color: var(--success-glow); color: var(--success); border-left: 4px solid var(--success) !important;">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+    </div>
+}
 
 <div class="row">
     <!-- Info Panel -->
@@ -121,13 +137,20 @@
                                 <td class="text-end">
                                     @if (!detail.ReturnDate.HasValue)
                                     {
-                                        <form asp-action="ReturnBook" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="detailId" value="@detail.Id" />
-                                            <button type="submit" class="btn btn-sm btn-premium-primary">
-                                                <i class="bi bi-arrow-return-left"></i> Trả sách
-                                            </button>
-                                        </form>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                                        {
+                                            <form asp-action="ReturnBook" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="detailId" value="@detail.Id" />
+                                                <button type="submit" class="btn btn-sm btn-premium-primary">
+                                                    <i class="bi bi-arrow-return-left"></i> Trả sách
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge borrowing"><i class="bi bi-clock-history"></i> Đang giữ</span>
+                                        }
                                     }
                                     else
                                     {

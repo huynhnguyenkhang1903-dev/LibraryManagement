@@ -86,7 +86,7 @@ else
                         <!-- Book top info -->
                         <div class="d-flex gap-3 mb-3">
                             <div class="position-relative flex-shrink-0">
-                                <img src="~/images/default_book_cover.png" class="book-thumbnail-large shadow-sm border" alt="Bìa sách" style="width: 75px; height: 105px; object-fit: cover;" />
+                                <img src="@(string.IsNullOrEmpty(book.ImageUrl) ? Url.Content("~/images/default_book_cover.png") : book.ImageUrl)" class="book-thumbnail-large shadow-sm border" alt="Bìa sách" style="width: 75px; height: 105px; object-fit: cover;" />
                             </div>
                             <div>
                                 <span class="badge bg-secondary-subtle text-secondary mb-1 px-2 py-1 fs-8 fw-500" style="border: 1px solid var(--border-glass);">

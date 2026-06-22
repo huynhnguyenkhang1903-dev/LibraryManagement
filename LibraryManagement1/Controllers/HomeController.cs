@@ -48,7 +48,7 @@ namespace LibraryManagement1.Controllers
         }
 
         // GET: Home/Dashboard (Trang Dashboard quản trị)
-        [Authorize]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Dashboard()
         {
             // 1. Stats calculations
@@ -109,7 +109,7 @@ namespace LibraryManagement1.Controllers
             return View();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult DatabaseSchema()
         {
             return View();

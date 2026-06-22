@@ -51,7 +51,7 @@ namespace LibraryManagement1.Controllers
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(clearPassword);
                 _context.Add(user);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Đã tạo tài khoản nhân viên {user.Username} thành công.";
+                TempData["SuccessMessage"] = $"Đã tạo tài khoản {user.Username} thành công.";
                 return RedirectToAction(nameof(Index));
             }
             return View(user);

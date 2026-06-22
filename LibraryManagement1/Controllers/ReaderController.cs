@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace LibraryManagement1.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Staff")]
     public class ReaderController : Controller
     {
         private readonly LibraryDbContext _context;

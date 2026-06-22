@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement1.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Staff")]
     public class CategoryController : Controller
     {
         private readonly LibraryDbContext _context;
